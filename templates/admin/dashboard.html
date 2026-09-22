@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>Admin Control Panel</h2>
+      <p class="text-sm">System oversight, platform usage statistics, user management, and moderation</p>
+    </div>
+    <span class="tag red font-bold">Administrator</span>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid-4 mb-5">
+    <div class="stat-card">
+      <div class="stat-icon">👨🎓</div>
+      <div class="stat-number gradient-text">{{ stats.students }}</div>
+      <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏢</div>
+      <div class="stat-number text-cyan">{{ stats.companies }}</div>
+      <div class="stat-label">Total Companies</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-number text-success">{{ stats.active_internships }} / {{ stats.internships }}</div>
+      <div class="stat-label">Active / Total Listings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📬</div>
+      <div class="stat-number text-warning">{{ stats.applications }}</div>
+      <div class="stat-label">Applications Sent</div>
+    </div>
+  </div>
+
+  <div class="grid-2 gap-4">
+    <!-- Recent Applications -->
+    <div class="card p-0" style="overflow: hidden;">
+      <div class="p-3 font-bold flex-between" style="border-bottom: 1px solid var(--border);">
+        <span>Recent Platform Applications</span>
+        <span class="text-xs text-muted">Latest 10</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Internship</th>
+              <th>Match</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in recent_apps %}
+              <tr>
+                <td>{{ app.student.full_name or 'N/A' }}</td>
+                <td>{{ app.internship.title }}</td>
+                <td><span class="tag primary">{{ app.match_score }}%</span></td>
+                <td><span class="status-badge status-{{ app.status }}">{{ app.status }}</span></td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="text-center text-muted">No applications yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Internships -->
+    <div class="card p-0" style="overflow: hidden;">
+      <div class="p-3 font-bold flex-between" style="border-bottom: 1px solid var(--border);">
+        <span>Recent Internships Posted</span>
+        <span class="text-xs text-muted">Latest 10</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Company</th>
+              <th>Posted</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in recent_internships %}
+              <tr>
+                <td><a href="{{ url_for('internship.detail', internship_id=i.id) }}">{{ i.title }}</a></td>
+                <td>{{ i.company.company_name }}</td>
+                <td><span class="text-xs text-muted">{{ i.created_at.strftime('%b %d') }}</span></td>
+                <td>
+                  {% if i.is_active %}<span class="status-badge status-active">Active</span>{% else %}<span class="status-badge status-inactive">Inactive</span>{% endif %}
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="text-center text-muted">No internships posted yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

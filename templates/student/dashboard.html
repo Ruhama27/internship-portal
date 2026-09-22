@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+
+  <!-- Welcome Banner & Profile Completion -->
+  <div class="card mb-4" style="background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.06)); border-color: rgba(99,102,241,0.25);">
+    <div class="flex-between flex-wrap gap-3">
+      <div>
+        <h2 style="margin-bottom: 4px;">Hello, {{ student.full_name or 'Student' }} 👋</h2>
+        <p class="text-sm">
+          {{ student.field_of_study or 'Field not set' }} student at {{ student.university or 'University not set' }}
+        </p>
+      </div>
+
+      <div style="min-width: 240px;">
+        <div class="flex-between text-xs mb-1">
+          <span class="text-muted">Profile Completion</span>
+          <span class="font-bold gradient-text">{{ student.completion_percent }}%</span>
+        </div>
+        <div class="completion-bar">
+          <div class="completion-fill" style="width: {{ student.completion_percent }}%;"></div>
+        </div>
+        {% if student.completion_percent < 80 %}
+          <a href="{{ url_for('student.profile') }}" class="text-xs text-warning mt-1 inline-block">⚠️ Add skills & CV to improve AI match accuracy →</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Summary Stats -->
+  <div class="grid-4 mb-5">
+    <div class="stat-card">
+      <div class="stat-icon">📄</div>
+      <div class="stat-number">{{ app_counts.total }}</div>
+      <div class="stat-label">Total Applications</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-number text-warning">{{ app_counts.pending }}</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💬</div>
+      <div class="stat-number gradient-text">{{ app_counts.interview }}</div>
+      <div class="stat-label">Interviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎉</div>
+      <div class="stat-number text-success">{{ app_counts.accepted }}</div>
+      <div class="stat-label">Accepted Offers</div>
+    </div>
+  </div>
+
+  <!-- Recommendations Section -->
+  <div class="flex-between mb-4">
+    <div>
+      <h2>Recommended for You <span class="tag primary" style="font-size:0.8rem;">AI Matched</span></h2>
+      <p class="text-sm">Matched based on your skills, field of study, and career interests</p>
+    </div>
+    <a href="{{ url_for('internship.search') }}" class="btn btn-outline btn-sm">Search All Listings →</a>
+  </div>
+
+  {% if recommendations %}
+    <div class="grid-3">
+      {% for internship, match in recommendations %}
+        <div class="internship-card fade-in-card">
+          <div class="flex-between mb-3">
+            <div class="flex-gap">
+              <div class="company-logo">{{ internship.company.company_name[0] }}</div>
+              <div>
+                <h4 style="margin:0;">{{ internship.title }}</h4>
+                <p class="text-xs">{{ internship.company.company_name }}</p>
+              </div>
+            </div>
+
+            <!-- Match Score Badge -->
+            <div class="match-badge {% if match.score >= 80 %}high{% elif match.score >= 60 %}medium{% else %}low{% endif %}">
+              ⚡ {{ match.score }}% Match
+            </div>
+          </div>
+
+          <p class="text-sm mb-3 text-muted" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ internship.description }}
+          </p>
+
+          <!-- Why Matched Snippet -->
+          <div class="mb-3 p-2 text-xs" style="background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary-lt);">
+            💡 {{ match.explanation }}
+          </div>
+
+          <!-- Required skills -->
+          <div class="flex-wrap gap-1 mb-3">
+            {% for skill in match.matched_required %}
+              <span class="tag green">✓ {{ skill.name }}</span>
+            {% endfor %}
+            {% for skill in match.missing_required[:2] %}
+              <span class="tag yellow">⚠ {{ skill.name }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="flex-between pt-3" style="border-top: 1px solid var(--border);">
+            <span class="work-chip work-{{ internship.work_type }}">{{ internship.work_type }}</span>
+            <a href="{{ url_for('internship.detail', internship_id=internship.id) }}" class="btn btn-primary btn-sm">View Details & Apply →</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3 class="empty-title">No recommendations yet</h3>
+      <p class="empty-desc">Complete your profile skills and interests to see AI matched internships.</p>
+      <a href="{{ url_for('student.profile') }}" class="btn btn-primary">Complete Profile Now</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

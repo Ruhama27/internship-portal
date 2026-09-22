@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Debre Berhan University — Online Student Internship Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- DBU Self-Service Welcome Header Card -->
+  <div class="card card-accent-orange mb-4">
+    <div class="card-header flex-between" style="border:none; padding-bottom:0;">
+      <h2>Student Internship Self-Service</h2>
+      <span class="tag primary">Debre Berhan University</span>
+    </div>
+
+    <p class="text-sm mt-2 mb-3" style="font-size: 1rem; color: #334155;">
+      Student Internship Self-Service provides you with essential services to:
+    </p>
+
+    <div class="p-3" style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: 4px;">
+      <ul style="list-style-type: disc; padding-left: 24px; color: #334155; font-size: 0.92rem; line-height: 1.8;">
+        <li>access and manage your academic profile, field of study, and skills portfolio;</li>
+        <li>upload your CV and statement essay for company evaluation;</li>
+        <li>receive personalized <strong>AI Internship Match Recommendations</strong> tailored to your background;</li>
+        <li>explore required vs preferred skill gaps for desired company positions;</li>
+        <li>apply directly to companies or send application emails via the platform;</li>
+        <li>track application status updates (Pending Review, Interview, Accepted Offer);</li>
+        <li>save and bookmark interesting company listings for later review;</li>
+        <li>and connect directly with company recruiters and software engineering teams.</li>
+      </ul>
+    </div>
+
+    <div class="flex-gap flex-wrap mt-4">
+      {% if current_user.is_authenticated %}
+        {% if current_user.role == 'student' %}
+          <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary btn-lg">Go to Student Match Dashboard →</a>
+        {% elif current_user.role == 'company' %}
+          <a href="{{ url_for('company.dashboard') }}" class="btn btn-cyan btn-lg">Go to Company Portal →</a>
+        {% endif %}
+      {% else %}
+        <a href="{{ url_for('auth.register_student') }}" class="btn btn-primary btn-lg">👨🎓 Register Student Account</a>
+        <a href="{{ url_for('auth.register_company') }}" class="btn btn-cyan btn-lg">🏢 Company Registration</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-lg">🔑 Portal Login</a>
+      {% endif %}
+      <a href="{{ url_for('internship.search') }}" class="btn btn-outline btn-lg">🔍 Search All Internships</a>
+    </div>
+  </div>
+
+  <!-- Platform Overview Stats -->
+  <div class="grid-4 mb-4">
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.students }}</div>
+      <div class="stat-label">Registered Students</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" style="color: var(--color-cyan);">{{ stats.companies }}</div>
+      <div class="stat-label">Partner Companies</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" style="color: var(--color-green);">{{ stats.internships }}</div>
+      <div class="stat-label">Active Listings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" style="color: var(--color-accent);">{{ stats.applications }}</div>
+      <div class="stat-label">Applications Sent</div>
+    </div>
+  </div>
+
+  <!-- Featured Listings -->
+  <div class="card">
+    <div class="flex-between mb-3">
+      <h3>Latest Featured Internship Openings</h3>
+      <a href="{{ url_for('internship.search') }}" class="btn btn-outline btn-sm">View All Listings →</a>
+    </div>
+
+    <div class="grid-3">
+      {% for internship in featured %}
+        <div class="internship-card">
+          <div class="flex-between mb-2">
+            <div class="flex-gap">
+              <div class="company-logo">{{ internship.company.company_name[0] }}</div>
+              <div>
+                <h4 style="margin:0;">{{ internship.title }}</h4>
+                <p class="text-xs text-muted">{{ internship.company.company_name }}</p>
+              </div>
+            </div>
+            <span class="work-chip work-{{ internship.work_type }}">{{ internship.work_type }}</span>
+          </div>
+
+          <p class="text-xs text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ internship.description }}
+          </p>
+
+          <div class="flex-wrap gap-1 mb-3">
+            {% for skill in internship.required_skills[:3] %}
+              <span class="tag primary">{{ skill.name }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="flex-between pt-2" style="border-top: 1px solid var(--border-light);">
+            <span class="text-xs text-muted">Field: {{ internship.field or 'General' }}</span>
+            <a href="{{ url_for('internship.detail', internship_id=internship.id) }}" class="btn btn-primary btn-sm">View Details</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}My Applications — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>My Applications</h2>
+      <p class="text-sm">Track your submitted internship applications and status updates</p>
+    </div>
+    <a href="{{ url_for('internship.search') }}" class="btn btn-primary btn-sm">Find More Internships</a>
+  </div>
+
+  {% if apps %}
+    <div class="card p-0" style="overflow: hidden;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Internship / Company</th>
+              <th>Applied Date</th>
+              <th>Match Score</th>
+              <th>Status</th>
+              <th>Contact Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in apps %}
+              <tr>
+                <td>
+                  <div class="font-bold">{{ app.internship.title }}</div>
+                  <div class="text-xs text-muted">{{ app.internship.company.company_name }} • {{ app.internship.location or 'Remote' }}</div>
+                </td>
+                <td>
+                  <span class="text-sm">{{ app.applied_at.strftime('%b %d, %Y') }}</span>
+                </td>
+                <td>
+                  <span class="match-badge {% if app.match_score >= 80 %}high{% elif app.match_score >= 60 %}medium{% else %}low{% endif %}">
+                    ⚡ {{ app.match_score or 'N/A' }}%
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge status-{{ app.status }}">{{ app.status }}</span>
+                </td>
+                <td>
+                  <a href="mailto:{{ app.internship.contact_email or app.internship.company.contact_email }}" class="text-xs gradient-text">
+                    ✉️ {{ app.internship.contact_email or app.internship.company.contact_email }}
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📮</div>
+      <h3 class="empty-title">No applications submitted yet</h3>
+      <p class="empty-desc">Explore internship listings and start applying today.</p>
+      <a href="{{ url_for('internship.search') }}" class="btn btn-primary">Browse Internships</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

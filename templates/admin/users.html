@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users — Admin — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>Manage Users</h2>
+      <p class="text-sm">View, activate, or deactivate registered student and company accounts</p>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost btn-sm">← Back to Dashboard</a>
+  </div>
+
+  <div class="card p-0" style="overflow: hidden;">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Name / Email</th>
+            <th>Role</th>
+            <th>Registered</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td>#{{ u.id }}</td>
+              <td>
+                <div class="font-bold">{{ u.display_name }}</div>
+                <div class="text-xs text-muted">{{ u.email }}</div>
+              </td>
+              <td>
+                {% if u.role == 'student' %}
+                  <span class="tag primary">👨🎓 Student</span>
+                {% elif u.role == 'company' %}
+                  <span class="tag cyan">🏢 Company</span>
+                {% else %}
+                  <span class="tag red">👑 Admin</span>
+                {% endif %}
+              </td>
+              <td><span class="text-xs text-muted">{{ u.created_at.strftime('%b %d, %Y') }}</span></td>
+              <td>
+                {% if u.is_active %}
+                  <span class="status-badge status-active">Active</span>
+                {% else %}
+                  <span class="status-badge status-rejected">Deactivated</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.id != current_user.id %}
+                  <form method="POST" action="{{ url_for('admin.toggle_user', user_id=u.id) }}">
+                    <button type="submit" class="btn {% if u.is_active %}btn-danger{% else %}btn-outline{% endif %} btn-sm">
+                      {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="text-xs text-muted">Self</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

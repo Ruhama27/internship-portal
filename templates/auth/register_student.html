@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Student Registration — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container-sm section">
+  <div class="card card-glow">
+    <div class="text-center mb-4">
+      <span class="tag primary mb-2">👨🎓 Student Portal</span>
+      <h2>Create Student Account</h2>
+      <p class="text-sm">Start discovering personalized internship recommendations</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" name="full_name" class="form-control" placeholder="Ruhama Nigusu" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student ID *</label>
+          <input type="text" name="student_id" class="form-control" placeholder="DBU/1234/15" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">University Email *</label>
+        <input type="email" name="email" class="form-control" placeholder="ruhama@student.edu" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">University Name *</label>
+          <input type="text" name="university" class="form-control" placeholder="Debre Berhan University" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department / Field *</label>
+          <input type="text" name="department" class="form-control" placeholder="Software Engineering" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Year of Study *</label>
+        <select name="year_of_study" class="form-control" required>
+          <option value="1">1st Year</option>
+          <option value="2">2nd Year</option>
+          <option value="3" selected>3rd Year</option>
+          <option value="4">4th Year / Final Year</option>
+          <option value="5">Postgraduate / Masters</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password *</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">Create Student Account →</button>
+    </form>
+
+    <div class="text-center mt-4 text-sm">
+      Already have an account? <a href="{{ url_for('auth.login') }}" class="gradient-text font-medium">Log in here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

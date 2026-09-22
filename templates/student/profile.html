@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}Edit Student Profile — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>Student Profile</h2>
+      <p class="text-sm">Manage your academic details, skills, interests, CV, and essay</p>
+    </div>
+    <div class="text-right">
+      <span class="text-xs text-muted">Profile Strength</span>
+      <div class="font-bold gradient-text text-lg">{{ student.completion_percent }}%</div>
+    </div>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    <!-- Academic & Personal Info Card -->
+    <div class="card mb-4">
+      <h3 class="card-title mb-4">🎓 Personal & Academic Information</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="full_name" class="form-control" value="{{ student.full_name or '' }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student ID</label>
+          <input type="text" name="student_id" class="form-control" value="{{ student.student_id or '' }}" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="text" name="phone" class="form-control" value="{{ student.phone or '' }}" placeholder="+251 91 123 4567">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location / City</label>
+          <input type="text" name="location" class="form-control" value="{{ student.location or '' }}" placeholder="Addis Ababa, Ethiopia">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">University</label>
+          <input type="text" name="university" class="form-control" value="{{ student.university or '' }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <input type="text" name="department" class="form-control" value="{{ student.department or '' }}" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Field of Study (for AI matching)</label>
+          <input type="text" name="field_of_study" class="form-control" value="{{ student.field_of_study or '' }}" placeholder="e.g. Software Engineering, Data Science">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year of Study</label>
+          <select name="year_of_study" class="form-control">
+            <option value="1" {% if student.year_of_study == 1 %}selected{% endif %}>1st Year</option>
+            <option value="2" {% if student.year_of_study == 2 %}selected{% endif %}>2nd Year</option>
+            <option value="3" {% if student.year_of_study == 3 %}selected{% endif %}>3rd Year</option>
+            <option value="4" {% if student.year_of_study == 4 %}selected{% endif %}>4th Year / Final Year</option>
+            <option value="5" {% if student.year_of_study == 5 %}selected{% endif %}>Postgraduate</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Expected Graduation Year</label>
+          <input type="text" name="expected_graduation" class="form-control" value="{{ student.expected_graduation or '' }}" placeholder="2025">
+        </div>
+        <div class="form-group">
+          <label class="form-label">GPA (Optional)</label>
+          <input type="number" step="0.01" min="0" max="4.0" name="gpa" class="form-control" value="{{ student.gpa or '' }}" placeholder="3.80">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bio / Career Objective</label>
+        <textarea name="bio" class="form-control" placeholder="Briefly describe your background, career goals, and what you are looking for in an internship...">{{ student.bio or '' }}</textarea>
+      </div>
+    </div>
+
+    <!-- Skills Checklist Card -->
+    <div class="card mb-4">
+      <h3 class="card-title mb-2">⚡ Technical Skills (Select all that apply)</h3>
+      <p class="text-sm text-muted mb-4">These skills are used to calculate your match score against internship requirements.</p>
+
+      {% for category, skills in skills_by_cat.items() %}
+        <div class="mb-4">
+          <div class="text-xs font-bold text-muted uppercase mb-2">{{ category }}</div>
+          <div class="skill-grid">
+            {% for skill in skills %}
+              {% set checked = skill in student.skills %}
+              <input type="checkbox" id="skill_{{ skill.id }}" name="skills" value="{{ skill.id }}" class="skill-check" {% if checked %}checked{% endif %}>
+              <label for="skill_{{ skill.id }}" class="skill-label">
+                {% if checked %}✓ {% endif %}{{ skill.name }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Career Interests Card -->
+    <div class="card mb-4">
+      <h3 class="card-title mb-2">🎯 Career Interests</h3>
+      <p class="text-sm text-muted mb-4">Select the domains you want to work in.</p>
+
+      <div class="skill-grid">
+        {% for interest in all_interests %}
+          {% set checked = interest in student.interests %}
+          <input type="checkbox" id="interest_{{ interest.id }}" name="interests" value="{{ interest.id }}" class="skill-check" {% if checked %}checked{% endif %}>
+          <label for="interest_{{ interest.id }}" class="skill-label">
+            {% if checked %}✓ {% endif %}{{ interest.name }}
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- CV & Application Essay Card -->
+    <div class="card mb-4">
+      <h3 class="card-title mb-4">📑 Documents (CV & Essay)</h3>
+
+      <div class="grid-2">
+        <!-- CV Upload -->
+        <div>
+          <label class="form-label">CV / Resume (PDF, DOCX)</label>
+          <div class="upload-zone {% if student.cv_filename %}has-file{% endif %}">
+            <div class="upload-icon">📄</div>
+            <div class="upload-text text-sm">
+              {% if student.cv_filename %}
+                <strong>Current CV:</strong> {{ student.cv_filename }}
+              {% else %}
+                Click to upload your CV
+              {% endif %}
+            </div>
+            <span class="text-xs text-muted block mt-1">PDF or Word document up to 16MB</span>
+            <input type="file" name="cv" accept=".pdf,.doc,.docx">
+          </div>
+        </div>
+
+        <!-- Essay Upload -->
+        <div>
+          <label class="form-label">Application Essay / Statement (PDF, DOCX)</label>
+          <div class="upload-zone {% if student.essay_filename %}has-file{% endif %}">
+            <div class="upload-icon">📝</div>
+            <div class="upload-text text-sm">
+              {% if student.essay_filename %}
+                <strong>Current Essay:</strong> {{ student.essay_filename }}
+              {% else %}
+                Click to upload your Essay
+              {% endif %}
+            </div>
+            <span class="text-xs text-muted block mt-1">Answers "Why are you interested in this internship?"</span>
+            <input type="file" name="essay" accept=".pdf,.doc,.docx">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex-between">
+      <a href="{{ url_for('student.dashboard') }}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-lg">Save Profile Changes →</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

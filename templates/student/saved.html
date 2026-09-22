@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Saved Internships — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>Saved Internships</h2>
+      <p class="text-sm">Opportunities you bookmarked for later review</p>
+    </div>
+    <a href="{{ url_for('internship.search') }}" class="btn btn-outline btn-sm">Find More Internships</a>
+  </div>
+
+  {% if results %}
+    <div class="grid-3">
+      {% for internship, match in results %}
+        <div class="internship-card fade-in-card">
+          <div class="flex-between mb-3">
+            <div class="flex-gap">
+              <div class="company-logo">{{ internship.company.company_name[0] }}</div>
+              <div>
+                <h4 style="margin:0;">{{ internship.title }}</h4>
+                <p class="text-xs">{{ internship.company.company_name }}</p>
+              </div>
+            </div>
+
+            <button class="save-btn saved" data-id="{{ internship.id }}" title="Unsave">❤️</button>
+          </div>
+
+          <div class="match-badge mb-3 {% if match.score >= 80 %}high{% elif match.score >= 60 %}medium{% else %}low{% endif %}">
+            ⚡ {{ match.score }}% Match
+          </div>
+
+          <p class="text-sm mb-3 text-muted" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ internship.description }}
+          </p>
+
+          <div class="flex-between pt-3" style="border-top: 1px solid var(--border);">
+            <span class="work-chip work-{{ internship.work_type }}">{{ internship.work_type }}</span>
+            <a href="{{ url_for('internship.detail', internship_id=internship.id) }}" class="btn btn-primary btn-sm">View Details →</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">❤️</div>
+      <h3 class="empty-title">No saved internships</h3>
+      <p class="empty-desc">Click the heart icon on any internship listing to save it here.</p>
+      <a href="{{ url_for('internship.search') }}" class="btn btn-primary">Browse Internships</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

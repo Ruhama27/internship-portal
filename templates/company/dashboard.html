@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Company Dashboard — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+
+  <div class="page-header flex-between">
+    <div>
+      <h2>Company Dashboard</h2>
+      <p class="text-sm">Manage your internship listings and applicant pipeline for <strong>{{ company.company_name }}</strong></p>
+    </div>
+    <a href="{{ url_for('company.post_internship') }}" class="btn btn-cyan btn-lg">+ Post New Internship</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-4 mb-5">
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-number">{{ internships|length }}</div>
+      <div class="stat-label">Total Listings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-number text-success">{{ active_count }}</div>
+      <div class="stat-label">Active Listings</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-number gradient-text">{{ total_apps }}</div>
+      <div class="stat-label">Total Applicants</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-number text-warning">{{ pending }}</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+  </div>
+
+  <!-- Listings Table / Grid -->
+  <div class="flex-between mb-4">
+    <h3>Your Internship Postings</h3>
+  </div>
+
+  {% if internships %}
+    <div class="card p-0 mb-5" style="overflow: hidden;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title / Field</th>
+              <th>Work Type</th>
+              <th>Applications</th>
+              <th>Status</th>
+              <th>Posted Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in internships %}
+              <tr>
+                <td>
+                  <div class="font-bold">{{ i.title }}</div>
+                  <div class="text-xs text-muted">{{ i.field or 'General' }} • {{ i.location or 'Remote' }}</div>
+                </td>
+                <td>
+                  <span class="work-chip work-{{ i.work_type }}">{{ i.work_type }}</span>
+                </td>
+                <td>
+                  <span class="tag primary">{{ i.applications|length }} Applicants</span>
+                </td>
+                <td>
+                  {% if i.is_active %}
+                    <span class="status-badge status-active">Active</span>
+                  {% else %}
+                    <span class="status-badge status-inactive">Closed</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="text-xs text-muted">{{ i.created_at.strftime('%b %d, %Y') }}</span>
+                </td>
+                <td>
+                  <div class="flex-gap">
+                    <a href="{{ url_for('company.applicants', internship_id=i.id) }}" class="btn btn-primary btn-sm">
+                      👥 Applicants ({{ i.applications|length }})
+                    </a>
+                    <a href="{{ url_for('company.edit_internship', internship_id=i.id) }}" class="btn btn-ghost btn-sm">
+                      ✏️ Edit
+                    </a>
+                    <form method="POST" action="{{ url_for('company.delete_internship', internship_id=i.id) }}" style="display:inline;" onsubmit="return confirm('Delete this internship posting?');">
+                      <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🏢</div>
+      <h3 class="empty-title">No internship postings yet</h3>
+      <p class="empty-desc">Create your first internship listing to start receiving AI matched applications.</p>
+      <a href="{{ url_for('company.post_internship') }}" class="btn btn-cyan">+ Post Your First Internship</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

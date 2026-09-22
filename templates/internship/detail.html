@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% block title %}{{ internship.title }} at {{ internship.company.company_name }} — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+
+  <div class="mb-3">
+    <a href="{{ url_for('internship.search') }}" class="text-xs text-muted">← Back to Search Results</a>
+  </div>
+
+  <div class="grid-3" style="grid-template-columns: 2fr 1fr; align-items: start;">
+    <!-- Main Detail Column -->
+    <div>
+      <div class="card mb-4">
+        <div class="flex-between flex-wrap gap-3 mb-4">
+          <div class="flex-gap">
+            <div class="company-logo" style="width: 60px; height: 60px; font-size: 1.6rem;">
+              {{ internship.company.company_name[0] }}
+            </div>
+            <div>
+              <h2 style="margin:0;">{{ internship.title }}</h2>
+              <p class="text-sm">
+                <strong>{{ internship.company.company_name }}</strong> • {{ internship.location or 'Remote' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex-gap">
+            {% if current_user.is_authenticated and current_user.role == 'student' %}
+              <button class="save-btn {% if is_saved %}saved{% endif %}" data-id="{{ internship.id }}" style="font-size: 1.2rem; padding: 8px 14px;">
+                {% if is_saved %}❤️{% else %}🤍{% endif %}
+              </button>
+            {% endif %}
+            <span class="work-chip work-{{ internship.work_type }}" style="font-size:0.9rem; padding: 6px 14px;">
+              {{ internship.work_type }}
+            </span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3 class="mb-2">About the Internship</h3>
+        <p class="text-sm mb-4" style="line-height: 1.8; white-space: pre-line;">{{ internship.description }}</p>
+
+        <!-- Required Skills -->
+        <h4 class="mb-2">Required Skills</h4>
+        <div class="flex-wrap gap-1 mb-4">
+          {% for skill in internship.required_skills %}
+            {% if match and skill in match.matched_required %}
+              <span class="tag green" style="font-size:0.85rem; padding: 6px 14px;">✓ {{ skill.name }} (You have this)</span>
+            {% elif match %}
+              <span class="tag yellow" style="font-size:0.85rem; padding: 6px 14px;">⚠ {{ skill.name }} (Missing)</span>
+            {% else %}
+              <span class="tag primary" style="font-size:0.85rem; padding: 6px 14px;">{{ skill.name }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- Preferred Skills -->
+        {% if internship.preferred_skills %}
+          <h4 class="mb-2">Preferred / Bonus Skills</h4>
+          <div class="flex-wrap gap-1 mb-4">
+            {% for skill in internship.preferred_skills %}
+              {% if match and skill in match.matched_preferred %}
+                <span class="tag cyan" style="font-size:0.85rem; padding: 6px 14px;">⭐ {{ skill.name }} (Match)</span>
+              {% else %}
+                <span class="tag" style="font-size:0.85rem; padding: 6px 14px;">{{ skill.name }}</span>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Company Overview -->
+        <div class="p-3 mt-4" style="background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <h4 class="mb-1">About {{ internship.company.company_name }}</h4>
+          <p class="text-xs text-muted mb-2">{{ internship.company.description or 'No company overview provided.' }}</p>
+          {% if internship.company.website %}
+            <a href="{{ internship.company.website }}" target="_blank" class="text-xs gradient-text font-medium">🌐 Visit Website →</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar: AI Match & Apply Column -->
+    <div>
+      {% if current_user.is_authenticated and current_user.role == 'student' %}
+        <!-- AI WHY AM I MATCHED? CARD -->
+        {% if match %}
+          <div class="match-breakdown mb-4">
+            <div class="text-xs font-bold text-muted uppercase mb-1">Why this internship matches you</div>
+            <div class="match-header">
+              <div class="match-big-score">{{ match.score }}%</div>
+              <div class="text-xs text-muted">Overall AI Match Confidence Score</div>
+            </div>
+
+            <!-- Breakdown Bars -->
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-label">
+                <span>Education / Field</span>
+                <span class="font-bold">{{ match.field_score }}%</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill green" style="width: {{ match.field_score }}%;"></div>
+              </div>
+            </div>
+
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-label">
+                <span>Skills Requirement</span>
+                <span class="font-bold">{{ match.skill_score }}%</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" style="width: {{ match.skill_score }}%;"></div>
+              </div>
+            </div>
+
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-label">
+                <span>Career Interests</span>
+                <span class="font-bold">{{ match.interest_score }}%</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill cyan" style="width: {{ match.interest_score }}%;"></div>
+              </div>
+            </div>
+
+            <div class="progress-bar-wrap mb-3">
+              <div class="progress-bar-label">
+                <span>Year of Study Bonus</span>
+                <span class="font-bold">{{ match.year_score }}%</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill yellow" style="width: {{ match.year_score }}%;"></div>
+              </div>
+            </div>
+
+            <p class="text-xs p-2" style="background: rgba(255,255,255,0.04); border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary-lt);">
+              💡 <strong>Match Explanation:</strong> {{ match.explanation }}
+            </p>
+          </div>
+        {% endif %}
+
+        <!-- APPLICATION CARD -->
+        <div class="card card-glow">
+          <h3 class="card-title mb-3">Apply Now</h3>
+
+          {% if already_applied %}
+            <div class="alert alert-success">
+              ✓ You have already applied for this internship.
+            </div>
+            <a href="{{ url_for('student.applications') }}" class="btn btn-ghost btn-block btn-sm mt-2">View Your Applications</a>
+          {% else %}
+            <form method="POST" action="{{ url_for('student.apply', internship_id=internship.id) }}">
+              <div class="form-group">
+                <label class="form-label text-xs">Optional Note / Cover Letter</label>
+                <textarea name="cover_letter" class="form-control text-sm" style="min-height: 80px;" placeholder="Briefly state why you're a great fit..."></textarea>
+              </div>
+
+              <div class="p-2 mb-3 text-xs" style="background: rgba(255,255,255,0.03); border-radius: var(--radius-sm);">
+                📄 <strong>Attached CV:</strong> {{ current_user.student_profile.cv_filename or 'None (update profile to attach)' }}
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block btn-lg">Submit Application →</button>
+            </form>
+
+            <div class="divider-text mt-3 mb-2">Or apply via Email</div>
+            <a href="mailto:{{ internship.contact_email or internship.company.contact_email }}?subject=Internship Application - {{ internship.title }}&body=Dear {{ internship.company.company_name }},%0D%0A%0D%0AMy name is {{ current_user.student_profile.full_name }}, a {{ current_user.student_profile.field_of_study }} student at {{ current_user.student_profile.university }}. I am interested in applying for the {{ internship.title }} position.%0D%0A%0D%0ABest regards," class="btn btn-outline btn-block btn-sm">
+              ✉️ Email {{ internship.contact_email or internship.company.contact_email }}
+            </a>
+          {% endif %}
+        </div>
+
+      {% elif not current_user.is_authenticated %}
+        <div class="card text-center">
+          <h3 class="mb-2">Log in to Apply</h3>
+          <p class="text-xs text-muted mb-4">Register or log in as a student to see your personalized AI match score and apply with one click.</p>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-block mb-2">Log In to Apply</a>
+          <a href="{{ url_for('auth.register_student') }}" class="btn btn-ghost btn-block btn-sm">Create Student Account</a>
+        </div>
+      {% else %}
+        <div class="card text-center">
+          <p class="text-xs text-muted">Logged in as Employer / Company.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

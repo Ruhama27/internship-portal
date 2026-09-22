@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Debre Berhan University — Internship Matching Portal{% endblock %}</title>
+  <meta name="description" content="Debre Berhan University Online Student Internship Matching Portal">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Blue Header Bar (Matching DBU Student Portal layout) -->
+  <header class="portal-header">
+    <div class="portal-brand">
+      <div class="dbu-logo-badge">
+        <span>🎓</span>
+      </div>
+      <span>Debre Berhan University - Online Internship Portal</span>
+    </div>
+
+    <div class="portal-user-box">
+      {% if current_user.is_authenticated %}
+        <span>Welcome <strong>{{ current_user.display_name | upper }}</strong></span>
+        <span>|</span>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}">Login</a>
+        <span>|</span>
+        <a href="{{ url_for('auth.register_student') }}">Register Student</a>
+        <span>|</span>
+        <a href="{{ url_for('auth.register_company') }}">Company Portal</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Main Portal Layout with Left Navigation Sidebar -->
+  <div class="portal-wrapper">
+    <aside class="portal-sidebar">
+      <nav class="portal-sidebar-nav">
+        <a href="{{ url_for('main.index') }}" class="portal-sidebar-link {% if request.endpoint == 'main.index' %}active{% endif %}">
+          <div class="link-left">
+            <span class="link-icon">🏠</span>
+            <span>Home / Portal</span>
+          </div>
+        </a>
+
+        <a href="{{ url_for('internship.search') }}" class="portal-sidebar-link {% if request.endpoint == 'internship.search' %}active{% endif %}">
+          <div class="link-left">
+            <span class="link-icon">🔍</span>
+            <span>Find Internships</span>
+          </div>
+        </a>
+
+        {% if current_user.is_authenticated %}
+          {% if current_user.role == 'student' %}
+            <a href="{{ url_for('student.dashboard') }}" class="portal-sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">⚡</span>
+                <span>AI Recommended Match</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('student.profile') }}" class="portal-sidebar-link {% if request.endpoint == 'student.profile' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">📄</span>
+                <span>Student Profile & Skills</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('student.applications') }}" class="portal-sidebar-link {% if request.endpoint == 'student.applications' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">📮</span>
+                <span>My Applications</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('student.saved') }}" class="portal-sidebar-link {% if request.endpoint == 'student.saved' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">❤️</span>
+                <span>Saved Internships</span>
+              </div>
+            </a>
+
+          {% elif current_user.role == 'company' %}
+            <a href="{{ url_for('company.dashboard') }}" class="portal-sidebar-link {% if request.endpoint == 'company.dashboard' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">🏢</span>
+                <span>Company Dashboard</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('company.post_internship') }}" class="portal-sidebar-link {% if request.endpoint == 'company.post_internship' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">➕</span>
+                <span>Post Internship</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('company.profile') }}" class="portal-sidebar-link {% if request.endpoint == 'company.profile' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">⚙️</span>
+                <span>Company Profile</span>
+              </div>
+            </a>
+
+          {% elif current_user.role == 'admin' %}
+            <a href="{{ url_for('admin.dashboard') }}" class="portal-sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">📊</span>
+                <span>Admin Dashboard</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('admin.users') }}" class="portal-sidebar-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">👥</span>
+                <span>User Management</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('admin.internships') }}" class="portal-sidebar-link {% if request.endpoint == 'admin.internships' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">📋</span>
+                <span>Manage Listings</span>
+              </div>
+            </a>
+          {% endif %}
+
+        {% else %}
+          <a href="{{ url_for('auth.register_student') }}" class="portal-sidebar-link">
+            <div class="link-left">
+              <span class="link-icon">👨🎓</span>
+              <span>Student Registration</span>
+            </div>
+          </a>
+          <a href="{{ url_for('auth.register_company') }}" class="portal-sidebar-link">
+            <div class="link-left">
+              <span class="link-icon">🏢</span>
+              <span>Company Registration</span>
+            </div>
+          </a>
+        {% endif %}
+      </nav>
+    </aside>
+
+    <main class="portal-content">
+      <!-- Flash Notifications -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/match.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

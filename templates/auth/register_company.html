@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Company Registration — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container-sm section">
+  <div class="card card-glow">
+    <div class="text-center mb-4">
+      <span class="tag cyan mb-2">🏢 Employer Portal</span>
+      <h2>Register Company</h2>
+      <p class="text-sm">Connect with talented, AI-matched student candidates</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-group">
+        <label class="form-label">Company Name *</label>
+        <input type="text" name="company_name" class="form-control" placeholder="ABC Technology Solutions" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Company Email *</label>
+          <input type="email" name="email" class="form-control" placeholder="hr@abctech.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="text" name="phone" class="form-control" placeholder="+251 91 123 4567">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input type="url" name="website" class="form-control" placeholder="https://abctech.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" class="form-control" placeholder="Addis Ababa, Ethiopia">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Company Overview</label>
+        <textarea name="description" class="form-control" placeholder="Describe your company culture, technology stack, and what interns will learn..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password *</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-cyan btn-block btn-lg mt-4">Create Company Profile →</button>
+    </form>
+
+    <div class="text-center mt-4 text-sm">
+      Already registered? <a href="{{ url_for('auth.login') }}" class="gradient-text font-medium">Log in here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

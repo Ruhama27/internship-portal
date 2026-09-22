@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Manage Internships — Admin — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>Manage All Internships</h2>
+      <p class="text-sm">Review platform-wide internship listings</p>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost btn-sm">← Back to Dashboard</a>
+  </div>
+
+  <div class="card p-0" style="overflow: hidden;">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Company</th>
+            <th>Field</th>
+            <th>Work Type</th>
+            <th>Applicants</th>
+            <th>Posted Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in internships %}
+            <tr>
+              <td>#{{ i.id }}</td>
+              <td><a href="{{ url_for('internship.detail', internship_id=i.id) }}" class="font-bold">{{ i.title }}</a></td>
+              <td>{{ i.company.company_name }}</td>
+              <td>{{ i.field or 'General' }}</td>
+              <td><span class="work-chip work-{{ i.work_type }}">{{ i.work_type }}</span></td>
+              <td><span class="tag primary">{{ i.applications|length }}</span></td>
+              <td><span class="text-xs text-muted">{{ i.created_at.strftime('%b %d, %Y') }}</span></td>
+              <td>
+                {% if i.is_active %}
+                  <span class="status-badge status-active">Active</span>
+                {% else %}
+                  <span class="status-badge status-inactive">Closed</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

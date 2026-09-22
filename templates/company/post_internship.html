@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block title %}{% if edit_mode %}Edit Internship{% else %}Post Internship{% endif %} — InternMatch{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>{% if edit_mode %}Edit Internship Listing{% else %}Post a New Internship{% endif %}</h2>
+      <p class="text-sm">Define required & preferred skills to allow our AI engine to rank the best candidates</p>
+    </div>
+    <a href="{{ url_for('company.dashboard') }}" class="btn btn-ghost btn-sm">← Back to Dashboard</a>
+  </div>
+
+  <form method="POST">
+    <div class="card mb-4">
+      <h3 class="card-title mb-4">📋 Internship Details</h3>
+
+      <div class="form-group">
+        <label class="form-label">Internship Title *</label>
+        <input type="text" name="title" class="form-control" value="{{ internship.title if edit_mode else '' }}" placeholder="Frontend Developer Intern" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Field / Academic Specialization</label>
+          <input type="text" name="field" class="form-control" value="{{ internship.field if edit_mode else '' }}" placeholder="Software Engineering">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Work Location</label>
+          <input type="text" name="location" class="form-control" value="{{ internship.location if edit_mode else '' }}" placeholder="Addis Ababa, Ethiopia">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Work Type</label>
+          <select name="work_type" class="form-control">
+            <option value="on-site" {% if edit_mode and internship.work_type == 'on-site' %}selected{% endif %}>On-site</option>
+            <option value="hybrid" {% if edit_mode and internship.work_type == 'hybrid' %}selected{% endif %}>Hybrid</option>
+            <option value="remote" {% if edit_mode and internship.work_type == 'remote' %}selected{% endif %}>Remote</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Number of Student Openings</label>
+          <input type="number" min="1" name="num_students" class="form-control" value="{{ internship.num_students if edit_mode else 1 }}">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Application Deadline</label>
+          <input type="date" name="deadline" class="form-control" value="{{ internship.deadline if edit_mode and internship.deadline else '' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Email for Applications</label>
+          <input type="email" name="contact_email" class="form-control" value="{{ internship.contact_email if edit_mode else company.contact_email }}" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Detailed Internship Description *</label>
+        <textarea name="description" class="form-control" style="min-height: 140px;" placeholder="Describe what the intern will work on, daily responsibilities, learning opportunities, and team culture..." required>{{ internship.description if edit_mode else '' }}</textarea>
+      </div>
+
+      {% if edit_mode %}
+        <div class="form-group">
+          <label class="checkbox-wrap">
+            <input type="checkbox" name="is_active" {% if internship.is_active %}checked{% endif %}>
+            <span>Listing is Active and accepting applications</span>
+          </label>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Required Skills Checklist -->
+    <div class="card mb-4">
+      <h3 class="card-title mb-2">⚡ Required Skills (Crucial for Match Scoring)</h3>
+      <p class="text-sm text-muted mb-4">Candidates lacking these skills will receive a lower match score.</p>
+
+      {% for category, skills in skills_by_cat.items() %}
+        <div class="mb-3">
+          <div class="text-xs font-bold text-muted uppercase mb-2">{{ category }}</div>
+          <div class="skill-grid">
+            {% for skill in skills %}
+              {% set checked = edit_mode and skill in internship.required_skills %}
+              <input type="checkbox" id="req_skill_{{ skill.id }}" name="required_skills" value="{{ skill.id }}" class="skill-check" {% if checked %}checked{% endif %}>
+              <label for="req_skill_{{ skill.id }}" class="skill-label">
+                {% if checked %}✓ {% endif %}{{ skill.name }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Preferred Skills -->
+    <div class="card mb-4">
+      <h3 class="card-title mb-2">💡 Preferred Skills (Bonus Match Scoring)</h3>
+      <p class="text-sm text-muted mb-4">Nice-to-have skills that give applicants a extra score boost.</p>
+
+      {% for category, skills in skills_by_cat.items() %}
+        <div class="mb-3">
+          <div class="text-xs font-bold text-muted uppercase mb-2">{{ category }}</div>
+          <div class="skill-grid">
+            {% for skill in skills %}
+              {% set checked = edit_mode and skill in internship.preferred_skills %}
+              <input type="checkbox" id="pref_skill_{{ skill.id }}" name="preferred_skills" value="{{ skill.id }}" class="skill-check" {% if checked %}checked{% endif %}>
+              <label for="pref_skill_{{ skill.id }}" class="skill-label">
+                {% if checked %}✓ {% endif %}{{ skill.name }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Category Tags -->
+    <div class="card mb-4">
+      <h3 class="card-title mb-2">🏷️ Internship Interest Categories / Tags</h3>
+      <div class="skill-grid">
+        {% for interest in all_interests %}
+          {% set checked = edit_mode and interest in internship.tags %}
+          <input type="checkbox" id="tag_{{ interest.id }}" name="tags" value="{{ interest.id }}" class="skill-check" {% if checked %}checked{% endif %}>
+          <label for="tag_{{ interest.id }}" class="skill-label">
+            {% if checked %}✓ {% endif %}{{ interest.name }}
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="flex-between">
+      <a href="{{ url_for('company.dashboard') }}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-cyan btn-lg">
+        {% if edit_mode %}Save Changes →{% else %}Publish Internship Listing →{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
