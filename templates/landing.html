@@ -20,25 +20,26 @@
       <ul style="list-style-type: disc; padding-left: 24px; color: #334155; font-size: 0.92rem; line-height: 1.8;">
         <li>access and manage your academic profile, field of study, and skills portfolio;</li>
         <li>upload your CV and statement essay for company evaluation;</li>
-        <li>receive personalized <strong>AI Internship Match Recommendations</strong> tailored to your background;</li>
-        <li>explore required vs preferred skill gaps for desired company positions;</li>
+        <li>explore available internship openings from verified partner companies;</li>
+        <li>review required and preferred skills for each position;</li>
         <li>apply directly to companies or send application emails via the platform;</li>
         <li>track application status updates (Pending Review, Interview, Accepted Offer);</li>
         <li>save and bookmark interesting company listings for later review;</li>
-        <li>and connect directly with company recruiters and software engineering teams.</li>
+        <li>and connect directly with company recruiters and teams.</li>
       </ul>
     </div>
 
     <div class="flex-gap flex-wrap mt-4">
       {% if current_user.is_authenticated %}
         {% if current_user.role == 'student' %}
-          <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary btn-lg">Go to Student Match Dashboard →</a>
+          <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary btn-lg">Go to My Dashboard →</a>
         {% elif current_user.role == 'company' %}
           <a href="{{ url_for('company.dashboard') }}" class="btn btn-cyan btn-lg">Go to Company Portal →</a>
+        {% elif current_user.role == 'admin' %}
+          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-lg">Go to Admin Panel →</a>
         {% endif %}
       {% else %}
-        <a href="{{ url_for('auth.register_student') }}" class="btn btn-primary btn-lg">👨🎓 Register Student Account</a>
-        <a href="{{ url_for('auth.register_company') }}" class="btn btn-cyan btn-lg">🏢 Company Registration</a>
+        <a href="{{ url_for('auth.register_student') }}" class="btn btn-primary btn-lg">👨‍🎓 Register Student Account</a>
         <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-lg">🔑 Portal Login</a>
       {% endif %}
       <a href="{{ url_for('internship.search') }}" class="btn btn-outline btn-lg">🔍 Search All Internships</a>

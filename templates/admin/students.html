@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Manage Students — DBU Internship Portal{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+  <div class="page-header flex-between">
+    <div>
+      <h2>👨‍🎓 Registered Students</h2>
+      <p class="text-sm">View and manage student accounts in the system</p>
+    </div>
+    <span class="tag primary">{{ students|length }} Students</span>
+  </div>
+
+  {% if students %}
+    <div class="card p-0" style="overflow: hidden;">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Student ID</th>
+              <th>University / Department</th>
+              <th>Email</th>
+              <th>Applications</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+              <tr>
+                <td>
+                  <div class="font-bold">{{ student.full_name or '—' }}</div>
+                  <div class="text-xs text-muted">Year {{ student.year_of_study or '?' }}</div>
+                </td>
+                <td class="text-xs text-muted">{{ student.student_id or '—' }}</td>
+                <td>
+                  <div class="text-xs">{{ student.university or '—' }}</div>
+                  <div class="text-xs text-muted">{{ student.department or '—' }}</div>
+                </td>
+                <td class="text-xs">{{ student.user.email }}</td>
+                <td class="text-center">
+                  <span class="tag primary">{{ student.applications|length }}</span>
+                </td>
+                <td>
+                  {% if student.user.is_active %}
+                    <span class="status-badge status-accepted">Active</span>
+                  {% else %}
+                    <span class="status-badge status-rejected">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <form method="POST" action="{{ url_for('admin.toggle_student', student_id=student.id) }}" style="margin:0;">
+                    {% if student.user.is_active %}
+                      <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Deactivate this student account?')">
+                        🚫 Deactivate
+                      </button>
+                    {% else %}
+                      <button type="submit" class="btn btn-outline btn-sm">
+                        ✅ Activate
+                      </button>
+                    {% endif %}
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">👨‍🎓</div>
+      <h3 class="empty-title">No students registered yet</h3>
+      <p class="empty-desc">Students will appear here once they create an account.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

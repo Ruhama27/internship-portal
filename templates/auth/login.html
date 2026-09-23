@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Login — InternMatch{% endblock %}
+{% block title %}Login — Debre Berhan University Internship Portal{% endblock %}
 
 {% block content %}
 <div class="container-sm section">
@@ -7,13 +7,13 @@
     <div class="text-center mb-4">
       <div class="company-logo mb-2" style="margin:0 auto;">🎓</div>
       <h2>Welcome Back</h2>
-      <p class="text-sm">Log in to your InternMatch account</p>
+      <p class="text-sm text-muted">Log in with your university email and password</p>
     </div>
 
     <form method="POST">
       <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input type="email" name="email" class="form-control" placeholder="name@university.edu" required autofocus>
+        <label class="form-label">Work / University Email</label>
+        <input type="email" name="email" class="form-control" placeholder="name@dbu.edu.et" required autofocus>
       </div>
 
       <div class="form-group">
@@ -24,16 +24,15 @@
       <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">Log In →</button>
     </form>
 
-    <div class="divider-text mt-4 mb-3">Or create a new account</div>
+    <div class="divider-text mt-4 mb-3">Are you a student?</div>
 
-    <div class="grid-2">
-      <a href="{{ url_for('auth.register_student') }}" class="btn btn-ghost text-center" style="justify-content: center;">
-        👨🎓 Register as Student
-      </a>
-      <a href="{{ url_for('auth.register_company') }}" class="btn btn-ghost text-center" style="justify-content: center;">
-        🏢 Register as Company
-      </a>
-    </div>
+    <a href="{{ url_for('auth.register_student') }}" class="btn btn-ghost btn-block text-center" style="justify-content: center;">
+      👨‍🎓 Create Student Account
+    </a>
+
+    <p class="text-xs text-muted text-center mt-3">
+      Company accounts are created by the University Admin.
+    </p>
   </div>
 </div>
 {% endblock %}

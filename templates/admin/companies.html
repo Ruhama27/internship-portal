@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}Manage Companies — DBU Internship Portal{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+
+  <div class="page-header flex-between">
+    <div>
+      <h2>🏢 Partner Companies</h2>
+      <p class="text-sm">Add and manage companies that participate in the internship program</p>
+    </div>
+    <span class="tag primary">{{ companies|length }} Companies</span>
+  </div>
+
+  <div class="grid-2 gap-4" style="align-items: start;">
+
+    <!-- ── Company List ─────────────────────────────────────────── -->
+    <div>
+      {% if companies %}
+        {% for company in companies %}
+          <div class="card mb-3" style="padding: 16px 20px;">
+            <div class="flex-between mb-2">
+              <div class="flex-gap">
+                <div class="company-logo" style="width:44px;height:44px;font-size:1.2rem;">
+                  {{ company.company_name[0] if company.company_name else '?' }}
+                </div>
+                <div>
+                  <div class="font-bold">{{ company.company_name }}</div>
+                  <div class="text-xs text-muted">{{ company.user.email }}</div>
+                </div>
+              </div>
+              {% if company.user.is_active %}
+                <span class="status-badge status-accepted">Active</span>
+              {% else %}
+                <span class="status-badge status-rejected">Inactive</span>
+              {% endif %}
+            </div>
+
+            <div class="text-xs text-muted mb-3">
+              {% if company.industry %}📌 {{ company.industry }}{% endif %}
+              {% if company.location %} &nbsp;•&nbsp; 📍 {{ company.location }}{% endif %}
+              &nbsp;•&nbsp; 📋 {{ company.internships|length }} listing(s)
+            </div>
+
+            <div class="flex-gap">
+              <!-- Toggle Active/Inactive -->
+              <form method="POST" action="{{ url_for('admin.toggle_company', company_id=company.id) }}" style="margin:0;">
+                {% if company.user.is_active %}
+                  <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Deactivate {{ company.company_name }}? They will not be able to log in.')">
+                    🚫 Deactivate
+                  </button>
+                {% else %}
+                  <button type="submit" class="btn btn-outline btn-sm">
+                    ✅ Activate
+                  </button>
+                {% endif %}
+              </form>
+
+              <!-- Remove Company -->
+              <form method="POST" action="{{ url_for('admin.remove_company', company_id=company.id) }}" style="margin:0;">
+                <button type="submit" class="btn btn-sm" style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);"
+                  onclick="return confirm('Permanently remove {{ company.company_name }} and ALL their internship listings? This cannot be undone.')">
+                  🗑️ Remove
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">🏢</div>
+          <h3 class="empty-title">No companies yet</h3>
+          <p class="empty-desc">Use the form to add the first partner company.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- ── Add Company Form ────────────────────────────────────── -->
+    <div class="card card-glow" style="position: sticky; top: 20px;">
+      <h3 class="card-title mb-1">➕ Add New Company</h3>
+      <p class="text-xs text-muted mb-4">Create a company account and share the login credentials with the company admin.</p>
+
+      <form method="POST" action="{{ url_for('admin.add_company') }}">
+
+        <div class="form-group">
+          <label class="form-label">Company Name <span style="color:var(--color-danger)">*</span></label>
+          <input type="text" name="company_name" class="form-control" placeholder="e.g. Ethio Telecom" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Work Email <span style="color:var(--color-danger)">*</span></label>
+            <input type="email" name="work_email" class="form-control" placeholder="hr@company.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Login Password <span style="color:var(--color-danger)">*</span></label>
+            <input type="text" name="password" class="form-control" placeholder="Set a strong password" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" name="phone" class="form-control" placeholder="+251 9 ...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Industry</label>
+            <input type="text" name="industry" class="form-control" placeholder="e.g. Telecom, Banking">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <select name="location" class="form-control">
+            <option value="">-- Select City --</option>
+            {% set cities = [
+              'Addis Ababa', 'Adama (Nazret)', 'Arba Minch', 'Asella', 'Axum',
+              'Bahir Dar', 'Bishoftu (Debre Zeit)', 'Debre Berhan', 'Debre Markos',
+              'Dessie', 'Dilla', 'Dire Dawa', 'Gondar', 'Harar', 'Hawassa',
+              'Hosaena', 'Jijiga', 'Jimma', 'Lalibela', 'Mekelle', 'Nekemte',
+              'Shashamane', 'Shire', 'Sodo', 'Woldia', 'Wolaita Sodo'
+            ] %}
+            {% for city in cities %}
+              <option value="{{ city }}, Ethiopia">{{ city }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Website</label>
+          <input type="url" name="website" class="form-control" placeholder="https://company.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Company Overview</label>
+          <textarea name="description" class="form-control" style="min-height: 70px;" placeholder="Brief description of the company..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-2">Create Company Account →</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

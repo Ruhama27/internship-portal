@@ -3,7 +3,6 @@ from flask import (Blueprint, render_template, redirect, url_for,
 from flask_login import current_user
 from decorators import company_required
 from models import db, Internship, Skill, Interest, Application, StudentProfile
-from matching import compute_match
 
 company_bp = Blueprint('company', __name__)
 
@@ -195,7 +194,7 @@ def applicants(internship_id):
     internship = Internship.query.filter_by(id=internship_id, company_id=company.id).first_or_404()
     apps = (Application.query
             .filter_by(internship_id=internship_id)
-            .order_by(Application.match_score.desc())
+            .order_by(Application.applied_at.desc())
             .all())
     return render_template('company/applicants.html',
                            company=company,

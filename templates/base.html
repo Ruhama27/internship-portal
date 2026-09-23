@@ -10,7 +10,7 @@
 </head>
 <body>
 
-  <!-- Top Blue Header Bar (Matching DBU Student Portal layout) -->
+  <!-- Top Blue Header Bar -->
   <header class="portal-header">
     <div class="portal-brand">
       <div class="dbu-logo-badge">
@@ -27,9 +27,7 @@
       {% else %}
         <a href="{{ url_for('auth.login') }}">Login</a>
         <span>|</span>
-        <a href="{{ url_for('auth.register_student') }}">Register Student</a>
-        <span>|</span>
-        <a href="{{ url_for('auth.register_company') }}">Company Portal</a>
+        <a href="{{ url_for('auth.register_student') }}">Student Register</a>
       {% endif %}
     </div>
   </header>
@@ -45,19 +43,21 @@
           </div>
         </a>
 
-        <a href="{{ url_for('internship.search') }}" class="portal-sidebar-link {% if request.endpoint == 'internship.search' %}active{% endif %}">
-          <div class="link-left">
-            <span class="link-icon">🔍</span>
-            <span>Find Internships</span>
-          </div>
-        </a>
-
         {% if current_user.is_authenticated %}
+
+          {# ── STUDENT NAVIGATION ── #}
           {% if current_user.role == 'student' %}
+            <a href="{{ url_for('internship.search') }}" class="portal-sidebar-link {% if request.endpoint == 'internship.search' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">🔍</span>
+                <span>Find Internships</span>
+              </div>
+            </a>
+
             <a href="{{ url_for('student.dashboard') }}" class="portal-sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
               <div class="link-left">
-                <span class="link-icon">⚡</span>
-                <span>Recommended Internships</span>
+                <span class="link-icon">📊</span>
+                <span>My Dashboard</span>
               </div>
             </a>
 
@@ -82,6 +82,7 @@
               </div>
             </a>
 
+          {# ── COMPANY NAVIGATION ── #}
           {% elif current_user.role == 'company' %}
             <a href="{{ url_for('company.dashboard') }}" class="portal-sidebar-link {% if request.endpoint == 'company.dashboard' %}active{% endif %}">
               <div class="link-left">
@@ -104,6 +105,7 @@
               </div>
             </a>
 
+          {# ── UNIVERSITY ADMIN NAVIGATION ── #}
           {% elif current_user.role == 'admin' %}
             <a href="{{ url_for('admin.dashboard') }}" class="portal-sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
               <div class="link-left">
@@ -112,32 +114,47 @@
               </div>
             </a>
 
-            <a href="{{ url_for('admin.users') }}" class="portal-sidebar-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+            <a href="{{ url_for('admin.companies') }}" class="portal-sidebar-link {% if request.endpoint in ['admin.companies', 'admin.add_company'] %}active{% endif %}">
               <div class="link-left">
-                <span class="link-icon">👥</span>
-                <span>User Management</span>
+                <span class="link-icon">🏢</span>
+                <span>Manage Companies</span>
+              </div>
+            </a>
+
+            <a href="{{ url_for('admin.students') }}" class="portal-sidebar-link {% if request.endpoint == 'admin.students' %}active{% endif %}">
+              <div class="link-left">
+                <span class="link-icon">👨‍🎓</span>
+                <span>Manage Students</span>
               </div>
             </a>
 
             <a href="{{ url_for('admin.internships') }}" class="portal-sidebar-link {% if request.endpoint == 'admin.internships' %}active{% endif %}">
               <div class="link-left">
                 <span class="link-icon">📋</span>
-                <span>Manage Listings</span>
+                <span>All Listings</span>
               </div>
             </a>
+
           {% endif %}
 
         {% else %}
+          {# ── GUEST NAVIGATION ── #}
+          <a href="{{ url_for('internship.search') }}" class="portal-sidebar-link {% if request.endpoint == 'internship.search' %}active{% endif %}">
+            <div class="link-left">
+              <span class="link-icon">🔍</span>
+              <span>Browse Internships</span>
+            </div>
+          </a>
           <a href="{{ url_for('auth.register_student') }}" class="portal-sidebar-link">
             <div class="link-left">
-              <span class="link-icon">👨🎓</span>
+              <span class="link-icon">👨‍🎓</span>
               <span>Student Registration</span>
             </div>
           </a>
-          <a href="{{ url_for('auth.register_company') }}" class="portal-sidebar-link">
+          <a href="{{ url_for('auth.login') }}" class="portal-sidebar-link">
             <div class="link-left">
-              <span class="link-icon">🏢</span>
-              <span>Company Registration</span>
+              <span class="link-icon">🔐</span>
+              <span>Login</span>
             </div>
           </a>
         {% endif %}
@@ -161,7 +178,6 @@
   </div>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/match.js') }}"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

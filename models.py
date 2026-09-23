@@ -181,7 +181,6 @@ class Application(db.Model):
     cover_letter = db.Column(db.Text)
     status       = db.Column(db.String(30), default='pending')
     # pending / interview / accepted / rejected
-    match_score  = db.Column(db.Float)
     applied_at   = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at   = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
