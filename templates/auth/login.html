@@ -1,38 +1,77 @@
 {% extends 'base.html' %}
-{% block title %}Login — Debre Berhan University Internship Portal{% endblock %}
+{% block title %}Portal Login — Debre Berhan University{% endblock %}
 
 {% block content %}
 <div class="container-sm section">
-  <div class="card card-glow">
+  <div class="card card-glow" style="max-width: 480px; margin: 0 auto;">
+    
     <div class="text-center mb-4">
-      <div class="company-logo mb-2" style="margin:0 auto;">🎓</div>
-      <h2>Welcome Back</h2>
-      <p class="text-sm text-muted">Log in with your university email and password</p>
+      <div class="company-logo mb-2" style="margin: 0 auto; width: 56px; height: 56px; font-size: 1.6rem; background: var(--gradient-btn-primary);">
+        🎓
+      </div>
+      <h2>Portal Login</h2>
+      <p class="text-sm text-muted">
+        Access your Debre Berhan University Internship account
+      </p>
+    </div>
+
+    <!-- Role Explanation Banner -->
+    <div class="p-3 mb-4 text-xs" style="background: rgba(14, 165, 233, 0.05); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-sm); line-height: 1.6;">
+      <div style="font-weight: 700; color: #0284c7; margin-bottom: 4px;">👥 3 Distinct Account Roles:</div>
+      <div><strong>🏛️ University Admin:</strong> Add & manage partner companies and students</div>
+      <div><strong>🏢 Company Admin:</strong> Post internships & approve/decline student applications</div>
+      <div><strong>👨‍🎓 Student:</strong> Search internships and submit applications</div>
     </div>
 
     <form method="POST">
       <div class="form-group">
-        <label class="form-label">Work / University Email</label>
-        <input type="email" name="email" class="form-control" placeholder="name@dbu.edu.et" required autofocus>
+        <label class="form-label">Work / Student Email <span style="color:var(--color-danger)">*</span></label>
+        <input type="email" id="emailInput" name="email" class="form-control" placeholder="admin@dbu.edu.et or company@work.com" required autofocus>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        <label class="form-label">Password <span style="color:var(--color-danger)">*</span></label>
+        <input type="password" id="passwordInput" name="password" class="form-control" placeholder="••••••••" required>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">Log In →</button>
+      <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">Sign In →</button>
     </form>
 
-    <div class="divider-text mt-4 mb-3">Are you a student?</div>
+    <!-- Quick Demo Logins for Fast Testing -->
+    <div class="mt-4 pt-3" style="border-top: 1px solid var(--border);">
+      <div class="text-xs text-muted font-bold text-center mb-2">⚡ QUICK LOGIN DEMO PRESETS</div>
+      <div class="grid-3 gap-2">
+        <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.75rem; padding: 6px 4px; border: 1px solid var(--border);"
+                onclick="fillLogin('admin@dbu.edu.et', 'admin123')">
+          🏛️ Univ Admin
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.75rem; padding: 6px 4px; border: 1px solid var(--border);"
+                onclick="fillLogin('abc@techcorp.com', 'company123')">
+          🏢 Company Admin
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.75rem; padding: 6px 4px; border: 1px solid var(--border);"
+                onclick="fillLogin('ruhama@student.com', 'student123')">
+          👨‍🎓 Student
+        </button>
+      </div>
+    </div>
+
+    <div class="divider-text mt-4 mb-3">Are you a new student?</div>
 
     <a href="{{ url_for('auth.register_student') }}" class="btn btn-ghost btn-block text-center" style="justify-content: center;">
       👨‍🎓 Create Student Account
     </a>
 
-    <p class="text-xs text-muted text-center mt-3">
-      Company accounts are created by the University Admin.
+    <p class="text-xs text-muted text-center mt-3" style="line-height: 1.4;">
+      ℹ️ <em>Company accounts are created by the University Admin. Contact the university administration to onboard your company.</em>
     </p>
   </div>
 </div>
+
+<script>
+function fillLogin(email, password) {
+  document.getElementById('emailInput').value = email;
+  document.getElementById('passwordInput').value = password;
+}
+</script>
 {% endblock %}

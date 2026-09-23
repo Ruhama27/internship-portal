@@ -113,6 +113,21 @@ def remove_company(company_id):
     return redirect(url_for('admin.companies'))
 
 
+@admin_bp.route('/companies/<int:company_id>/reset_password', methods=['POST'])
+@admin_required
+def reset_company_password(company_id):
+    """University admin resets the password for a company admin account."""
+    profile = CompanyProfile.query.get_or_404(company_id)
+    new_password = request.form.get('new_password', '').strip()
+    if not new_password or len(new_password) < 6:
+        flash('Password must be at least 6 characters.', 'danger')
+    else:
+        profile.user.set_password(new_password)
+        db.session.commit()
+        flash(f'Password for company "{profile.company_name}" has been updated to: {new_password}', 'success')
+    return redirect(url_for('admin.companies'))
+
+
 # ─── Student Management ───────────────────────────────────────────────────────
 
 @admin_bp.route('/students')

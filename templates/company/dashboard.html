@@ -1,44 +1,175 @@
 {% extends 'base.html' %}
-{% block title %}Company Dashboard — InternMatch{% endblock %}
+{% block title %}Company Admin Dashboard — Debre Berhan University Portal{% endblock %}
 
 {% block content %}
 <div class="container section-sm">
 
+  <!-- Header Banner -->
   <div class="page-header flex-between">
     <div>
-      <h2>Company Dashboard</h2>
-      <p class="text-sm">Manage your internship listings and applicant pipeline for <strong>{{ company.company_name }}</strong></p>
+      <div class="flex-gap mb-1">
+        <span class="tag cyan font-bold">🏢 COMPANY ADMIN</span>
+        <span class="text-xs text-muted">Debre Berhan University Partner</span>
+      </div>
+      <h2>{{ company.company_name }} — Company Admin Dashboard</h2>
+      <p class="text-sm text-muted">
+        Logged in work email: <strong>{{ current_user.email }}</strong> • Review and approve or decline student applications
+      </p>
     </div>
-    <a href="{{ url_for('company.post_internship') }}" class="btn btn-cyan btn-lg">+ Post New Internship</a>
+    <div class="flex-gap">
+      <a href="{{ url_for('company.all_applications') }}" class="btn btn-primary">
+        📥 View All Applications ({{ total_apps }})
+      </a>
+      <a href="{{ url_for('company.post_internship') }}" class="btn btn-cyan">
+        + Post New Internship
+      </a>
+    </div>
   </div>
 
-  <!-- Stats -->
+  <!-- Role Notice Alert -->
+  <div class="alert alert-info mb-4" style="background: rgba(14, 165, 233, 0.08); border-left: 4px solid var(--color-cyan); color: #0284c7; padding: 12px 18px; border-radius: var(--radius-md);">
+    <div style="font-weight: 600; margin-bottom: 2px;">💼 Company Admin Workspace</div>
+    <div class="text-xs" style="color: #0369a1; line-height: 1.5;">
+      As the <strong>Company Admin</strong>, your account is dedicated to managing your company's internship listings and <strong>approving or declining student applications</strong>. Partner companies are onboarded and managed by the University Admin.
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
   <div class="grid-4 mb-5">
-    <div class="stat-card">
-      <div class="stat-icon">📋</div>
-      <div class="stat-number">{{ internships|length }}</div>
-      <div class="stat-label">Total Listings</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">✅</div>
-      <div class="stat-number text-success">{{ active_count }}</div>
-      <div class="stat-label">Active Listings</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">👥</div>
-      <div class="stat-number gradient-text">{{ total_apps }}</div>
-      <div class="stat-label">Total Applicants</div>
-    </div>
-    <div class="stat-card">
+    <div class="stat-card" style="border-top: 3px solid var(--color-warning);">
       <div class="stat-icon">⏳</div>
       <div class="stat-number text-warning">{{ pending }}</div>
-      <div class="stat-label">Pending Review</div>
+      <div class="stat-label">Pending Your Review</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid var(--color-success);">
+      <div class="stat-icon">✅</div>
+      <div class="stat-number text-success">{{ accepted_apps|length }}</div>
+      <div class="stat-label">Approved (Accepted)</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid #ef4444;">
+      <div class="stat-icon">❌</div>
+      <div class="stat-number" style="color:#ef4444;">{{ rejected_apps|length }}</div>
+      <div class="stat-label">Declined (Rejected)</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid var(--color-cyan);">
+      <div class="stat-icon">📋</div>
+      <div class="stat-number text-cyan">{{ active_count }} / {{ internships|length }}</div>
+      <div class="stat-label">Active / Total Listings</div>
     </div>
   </div>
 
-  <!-- Listings Table / Grid -->
-  <div class="flex-between mb-4">
-    <h3>Your Internship Postings</h3>
+  <!-- ── Section: Applications Requiring Immediate Action ────────────── -->
+  <div class="card card-glow mb-5" style="border-color: rgba(245, 158, 11, 0.3);">
+    <div class="flex-between mb-3 pb-2" style="border-bottom: 1px solid var(--border);">
+      <div>
+        <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span>⏳ Applications Requiring Your Review</span>
+          {% if pending > 0 %}
+            <span class="badge badge-warning" style="background:#f59e0b; color:#fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px;">{{ pending }} Action Required</span>
+          {% endif %}
+        </h3>
+        <p class="text-xs text-muted" style="margin: 4px 0 0 0;">
+          Review applicant qualifications and make an immediate decision: Approve, Decline, or invite to Interview.
+        </p>
+      </div>
+      {% if all_apps %}
+        <a href="{{ url_for('company.all_applications') }}" class="btn btn-ghost btn-sm">
+          View Full Pipeline →
+        </a>
+      {% endif %}
+    </div>
+
+    {% if pending_apps %}
+      <div class="flex-flex-column gap-3">
+        {% for app in pending_apps %}
+          {% set s = app.student %}
+          <div class="card p-3 mb-2" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--radius-md);">
+            <div class="flex-between flex-wrap gap-2 mb-2">
+              <div class="flex-gap">
+                <div class="company-logo" style="width:42px; height:42px; background: var(--gradient-btn-cyan); font-size:1.1rem;">
+                  {{ s.full_name[0] if s.full_name else 'S' }}
+                </div>
+                <div>
+                  <div class="font-bold" style="font-size: 1rem;">{{ s.full_name or 'Student' }}</div>
+                  <div class="text-xs text-muted">
+                    Applied for: <strong class="text-cyan">{{ app.internship.title }}</strong> • {{ app.applied_at.strftime('%b %d, %Y') }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Instant Decision Buttons -->
+              <div class="flex-gap">
+                <!-- Approve Form -->
+                <form method="POST" action="{{ url_for('company.update_status', app_id=app.id) }}" style="display:inline; margin:0;">
+                  <input type="hidden" name="status" value="accepted">
+                  <button type="submit" class="btn btn-sm" style="background: #10b981; color: white; border: none; font-weight: 600;" onclick="return confirm('Approve {{ s.full_name }} for this internship?');">
+                    ✅ Approve Application
+                  </button>
+                </form>
+
+                <!-- Decline Form -->
+                <form method="POST" action="{{ url_for('company.update_status', app_id=app.id) }}" style="display:inline; margin:0;">
+                  <input type="hidden" name="status" value="rejected">
+                  <button type="submit" class="btn btn-sm" style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); font-weight: 600;" onclick="return confirm('Decline {{ s.full_name }}\'s application?');">
+                    ❌ Decline
+                  </button>
+                </form>
+
+                <!-- Interview Form -->
+                <form method="POST" action="{{ url_for('company.update_status', app_id=app.id) }}" style="display:inline; margin:0;">
+                  <input type="hidden" name="status" value="interview">
+                  <button type="submit" class="btn btn-ghost btn-sm" style="border: 1px solid var(--border);">
+                    💬 Interview
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Student Profile Summary -->
+            <div class="grid-2 gap-2 text-xs p-2 mb-2" style="background: rgba(0,0,0,0.03); border-radius: var(--radius-sm);">
+              <div>
+                <strong>Academic:</strong> {{ s.university or 'Debre Berhan University' }} • {{ s.department or 'N/A' }} • Year {{ s.year_of_study or '?' }}{% if s.gpa %} (GPA: {{ s.gpa }}){% endif %}
+              </div>
+              <div class="flex-gap">
+                <span>✉️ <a href="mailto:{{ s.user.email }}">{{ s.user.email }}</a></span>
+                {% if s.phone %}<span>📞 {{ s.phone }}</span>{% endif %}
+                {% if s.cv_filename %}
+                  <a href="{{ url_for('static', filename='uploads/' ~ s.cv_filename) }}" target="_blank" class="text-cyan font-bold" style="text-decoration: underline;">
+                    📄 Download CV
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if app.cover_letter %}
+              <div class="text-xs p-2" style="background: rgba(255,255,255,0.03); border-left: 3px solid var(--color-cyan); border-radius: 4px;">
+                <strong>Cover Note:</strong> "{{ app.cover_letter }}"
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state p-4 text-center">
+        <div style="font-size: 2.2rem; margin-bottom: 6px;">🎉</div>
+        <h4 style="margin-bottom: 4px;">All caught up!</h4>
+        <p class="text-xs text-muted">There are no pending applications waiting for your decision right now.</p>
+        {% if all_apps %}
+          <a href="{{ url_for('company.all_applications') }}" class="btn btn-outline btn-sm mt-2">
+            View Past Decisions ({{ all_apps|length }} Total Applications)
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Section: Your Internship Postings ───────────────────────────── -->
+  <div class="flex-between mb-3">
+    <div>
+      <h3 style="margin:0;">📋 Your Internship Postings</h3>
+      <p class="text-xs text-muted" style="margin:2px 0 0 0;">Manage your open positions and review applicant submissions</p>
+    </div>
+    <a href="{{ url_for('company.post_internship') }}" class="btn btn-cyan btn-sm">+ Post New Internship</a>
   </div>
 
   {% if internships %}
@@ -49,24 +180,35 @@
             <tr>
               <th>Title / Field</th>
               <th>Work Type</th>
-              <th>Applications</th>
-              <th>Status</th>
+              <th>Applications & Status</th>
+              <th>Listing Status</th>
               <th>Posted Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for i in internships %}
+              {% set i_pending = i.applications | selectattr('status', 'equalto', 'pending') | list | length %}
+              {% set i_accepted = i.applications | selectattr('status', 'equalto', 'accepted') | list | length %}
+              {% set i_rejected = i.applications | selectattr('status', 'equalto', 'rejected') | list | length %}
               <tr>
                 <td>
                   <div class="font-bold">{{ i.title }}</div>
-                  <div class="text-xs text-muted">{{ i.field or 'General' }} • {{ i.location or 'Remote' }}</div>
+                  <div class="text-xs text-muted">{{ i.field or 'General' }} • {{ i.location or 'Debre Berhan' }}</div>
                 </td>
                 <td>
                   <span class="work-chip work-{{ i.work_type }}">{{ i.work_type }}</span>
                 </td>
                 <td>
-                  <span class="tag primary">{{ i.applications|length }} Applicants</span>
+                  <div class="flex-gap flex-wrap">
+                    <span class="tag primary">{{ i.applications|length }} Total</span>
+                    {% if i_pending > 0 %}
+                      <span class="tag warning">{{ i_pending }} Pending</span>
+                    {% endif %}
+                    {% if i_accepted > 0 %}
+                      <span class="tag" style="background: rgba(16,185,129,0.15); color: #10b981;">{{ i_accepted }} Accepted</span>
+                    {% endif %}
+                  </div>
                 </td>
                 <td>
                   {% if i.is_active %}
@@ -81,13 +223,13 @@
                 <td>
                   <div class="flex-gap">
                     <a href="{{ url_for('company.applicants', internship_id=i.id) }}" class="btn btn-primary btn-sm">
-                      👥 Applicants ({{ i.applications|length }})
+                      👥 Review Applicants ({{ i.applications|length }})
                     </a>
                     <a href="{{ url_for('company.edit_internship', internship_id=i.id) }}" class="btn btn-ghost btn-sm">
                       ✏️ Edit
                     </a>
-                    <form method="POST" action="{{ url_for('company.delete_internship', internship_id=i.id) }}" style="display:inline;" onsubmit="return confirm('Delete this internship posting?');">
-                      <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                    <form method="POST" action="{{ url_for('company.delete_internship', internship_id=i.id) }}" style="display:inline; margin:0;" onsubmit="return confirm('Delete this internship posting and its applications?');">
+                      <button type="submit" class="btn btn-danger btn-sm" title="Delete">🗑️</button>
                     </form>
                   </div>
                 </td>
@@ -98,11 +240,11 @@
       </div>
     </div>
   {% else %}
-    <div class="empty-state">
-      <div class="empty-icon">🏢</div>
-      <h3 class="empty-title">No internship postings yet</h3>
-      <p class="empty-desc">Create your first internship listing to start receiving applications.</p>
-      <a href="{{ url_for('company.post_internship') }}" class="btn btn-cyan">+ Post Your First Internship</a>
+    <div class="card text-center p-5 mb-5">
+      <div style="font-size: 2.5rem; margin-bottom: 8px;">🏢</div>
+      <h3>No internship postings yet</h3>
+      <p class="text-sm text-muted mb-4">Post your first internship vacancy so university students can discover and apply to your company.</p>
+      <a href="{{ url_for('company.post_internship') }}" class="btn btn-cyan btn-lg">+ Post Your First Internship</a>
     </div>
   {% endif %}
 

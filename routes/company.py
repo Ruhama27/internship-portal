@@ -9,6 +9,8 @@ company_bp = Blueprint('company', __name__)
 
 # ─── Dashboard ────────────────────────────────────────────────────────────────
 
+# ─── Dashboard ────────────────────────────────────────────────────────────────
+
 @company_bp.route('/dashboard')
 @company_required
 def dashboard():
@@ -17,24 +19,105 @@ def dashboard():
                    .filter_by(company_id=company.id)
                    .order_by(Internship.created_at.desc())
                    .all())
-    total_apps = sum(len(i.applications) for i in internships)
-    pending    = sum(sum(1 for a in i.applications if a.status == 'pending') for i in internships)
+    
+    internship_ids = [i.id for i in internships]
+    if internship_ids:
+        all_apps = (Application.query
+                    .filter(Application.internship_id.in_(internship_ids))
+                    .order_by(Application.applied_at.desc())
+                    .all())
+    else:
+        all_apps = []
+
+    pending_apps = [a for a in all_apps if a.status == 'pending']
+    accepted_apps = [a for a in all_apps if a.status == 'accepted']
+    rejected_apps = [a for a in all_apps if a.status == 'rejected']
     active_count = sum(1 for i in internships if i.is_active)
+
     return render_template('company/dashboard.html',
                            company=company,
                            internships=internships,
-                           total_apps=total_apps,
-                           pending=pending,
+                           all_apps=all_apps,
+                           pending_apps=pending_apps,
+                           accepted_apps=accepted_apps,
+                           rejected_apps=rejected_apps,
+                           total_apps=len(all_apps),
+                           pending=len(pending_apps),
                            active_count=active_count)
 
 
-# ─── Company Profile ──────────────────────────────────────────────────────────
+# ─── All Applications (Approve / Decline) ───────────────────────────────────
+
+@company_bp.route('/applications')
+@company_required
+def all_applications():
+    company = current_user.company_profile
+    status_filter = request.args.get('status', 'all').lower()
+    internship_id = request.args.get('internship_id', type=int)
+
+    internships = Internship.query.filter_by(company_id=company.id).all()
+    internship_ids = [i.id for i in internships]
+
+    if not internship_ids:
+        return render_template('company/all_applications.html',
+                               company=company,
+                               applications=[],
+                               internships=[],
+                               current_status=status_filter,
+                               current_internship_id=internship_id,
+                               counts={'all': 0, 'pending': 0, 'accepted': 0, 'rejected': 0, 'interview': 0})
+
+    query = Application.query.filter(Application.internship_id.in_(internship_ids))
+
+    if internship_id:
+        query = query.filter_by(internship_id=internship_id)
+
+    if status_filter in ('pending', 'accepted', 'rejected', 'interview'):
+        query = query.filter_by(status=status_filter)
+
+    applications = query.order_by(Application.applied_at.desc()).all()
+
+    # Get counts for tabs
+    base_apps = Application.query.filter(Application.internship_id.in_(internship_ids)).all()
+    counts = {
+        'all': len(base_apps),
+        'pending': sum(1 for a in base_apps if a.status == 'pending'),
+        'accepted': sum(1 for a in base_apps if a.status == 'accepted'),
+        'rejected': sum(1 for a in base_apps if a.status == 'rejected'),
+        'interview': sum(1 for a in base_apps if a.status == 'interview'),
+    }
+
+    return render_template('company/all_applications.html',
+                           company=company,
+                           applications=applications,
+                           internships=internships,
+                           current_status=status_filter,
+                           current_internship_id=internship_id,
+                           counts=counts)
+
+
+# ─── Company Profile & Password ───────────────────────────────────────────────
 
 @company_bp.route('/profile', methods=['GET', 'POST'])
 @company_required
 def profile():
     company = current_user.company_profile
     if request.method == 'POST':
+        action = request.form.get('action', 'profile')
+
+        if action == 'password':
+            new_password = request.form.get('new_password', '').strip()
+            confirm_password = request.form.get('confirm_password', '').strip()
+            if not new_password or len(new_password) < 6:
+                flash('New password must be at least 6 characters long.', 'danger')
+            elif new_password != confirm_password:
+                flash('Passwords do not match.', 'danger')
+            else:
+                current_user.set_password(new_password)
+                db.session.commit()
+                flash('Your company admin password has been updated successfully!', 'success')
+            return redirect(url_for('company.profile'))
+
         company.company_name  = request.form.get('company_name', '').strip()
         company.phone         = request.form.get('phone', '').strip()
         company.website       = request.form.get('website', '').strip()
@@ -212,10 +295,22 @@ def update_status(app_id):
     company = current_user.company_profile
     if application.internship.company_id != company.id:
         return jsonify({'error': 'Forbidden'}), 403
+
     new_status = request.form.get('status')
     if new_status in ('pending', 'interview', 'accepted', 'rejected'):
         application.status = new_status
         db.session.commit()
-        flash(f'Application status updated to {new_status}.', 'success')
-    return redirect(url_for('company.applicants',
-                            internship_id=application.internship_id))
+        student_name = application.student.full_name or 'Student'
+        status_labels = {
+            'accepted': 'Approved (Accepted) 🎉',
+            'rejected': 'Declined (Rejected)',
+            'interview': 'Moved to Interview 💬',
+            'pending': 'Moved to Pending ⏳',
+        }
+        flash(f'Application for {student_name} is now {status_labels.get(new_status, new_status)}.', 'success')
+
+    # Allow custom redirect target
+    next_url = request.form.get('next') or request.referrer
+    if next_url:
+        return redirect(next_url)
+    return redirect(url_for('company.applicants', internship_id=application.internship_id))

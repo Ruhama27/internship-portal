@@ -63,12 +63,39 @@ class User(UserMixin, db.Model):
     @property
     def display_name(self):
         if self.role == 'student' and self.student_profile:
-            return self.student_profile.full_name
+            return self.student_profile.full_name or self.email
         if self.role == 'company' and self.company_profile:
-            return self.company_profile.company_name
+            return self.company_profile.company_name or 'Company Admin'
         if self.role == 'admin':
-            return 'Admin'
+            return 'University Admin'
         return self.email
+
+    @property
+    def role_label(self):
+        if self.role == 'admin':
+            return 'University Admin'
+        elif self.role == 'company':
+            return 'Company Admin'
+        elif self.role == 'student':
+            return 'Student'
+        return self.role.title()
+
+    @property
+    def role_badge_color(self):
+        if self.role == 'admin':
+            return 'red'
+        elif self.role == 'company':
+            return 'cyan'
+        return 'primary'
+
+    @property
+    def pending_apps_count(self):
+        if self.role == 'company' and self.company_profile:
+            count = 0
+            for i in self.company_profile.internships:
+                count += sum(1 for a in i.applications if a.status == 'pending')
+            return count
+        return 0
 
 
 class StudentProfile(db.Model):

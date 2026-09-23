@@ -1,125 +1,174 @@
 {% extends 'base.html' %}
-{% block title %}Admin Dashboard — DBU Internship Portal{% endblock %}
+{% block title %}University Admin Dashboard — Debre Berhan University Portal{% endblock %}
 
 {% block content %}
 <div class="container section-sm">
+
   <div class="page-header flex-between">
     <div>
+      <div class="flex-gap mb-1">
+        <span class="tag red font-bold">🏛️ UNIVERSITY ADMIN</span>
+        <span class="text-xs text-muted">Debre Berhan University Administration</span>
+      </div>
       <h2>University Admin Dashboard</h2>
-      <p class="text-sm">Platform overview — Debre Berhan University Internship Portal</p>
+      <p class="text-sm text-muted">
+        Manage partner company onboarding, student registries, and program oversight.
+      </p>
     </div>
-    <span class="tag red font-bold">University Administrator</span>
+    <div class="flex-gap">
+      <a href="{{ url_for('admin.companies') }}" class="btn btn-primary">
+        🏢 Manage & Add Companies
+      </a>
+      <a href="{{ url_for('admin.students') }}" class="btn btn-outline">
+        👨‍🎓 View Students
+      </a>
+    </div>
+  </div>
+
+  <!-- Role Differentiation Notice -->
+  <div class="alert alert-info mb-4" style="background: rgba(147, 51, 234, 0.06); border-left: 4px solid #9333ea; color: #6b21a8; padding: 14px 18px; border-radius: var(--radius-md);">
+    <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 3px;">🏛️ University Admin Responsibilities</div>
+    <div class="text-xs" style="color: #581c87; line-height: 1.6;">
+      As the <strong>University Administrator</strong>, your primary role is to <strong>add, verify, activate, and remove partner company accounts</strong>, as well as supervise enrolled students. 
+      Each partner company has its own <strong>Company Admin</strong> who logs in with their company credentials to review, interview, and <strong>approve or decline</strong> student applications.
+    </div>
   </div>
 
   <!-- Stats Grid -->
   <div class="grid-4 mb-5">
-    <div class="stat-card">
-      <div class="stat-icon">👨‍🎓</div>
-      <div class="stat-number gradient-text">{{ stats.students }}</div>
-      <div class="stat-label">Registered Students</div>
-    </div>
-    <div class="stat-card">
+    <div class="stat-card" style="border-top: 3px solid var(--color-cyan);">
       <div class="stat-icon">🏢</div>
       <div class="stat-number text-cyan">{{ stats.companies }}</div>
       <div class="stat-label">Partner Companies</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="border-top: 3px solid #6366f1;">
+      <div class="stat-icon">👨‍🎓</div>
+      <div class="stat-number gradient-text">{{ stats.students }}</div>
+      <div class="stat-label">Registered Students</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid var(--color-success);">
       <div class="stat-icon">📋</div>
       <div class="stat-number text-success">{{ stats.active_internships }} / {{ stats.internships }}</div>
       <div class="stat-label">Active / Total Listings</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="border-top: 3px solid var(--color-warning);">
       <div class="stat-icon">📬</div>
       <div class="stat-number text-warning">{{ stats.applications }}</div>
-      <div class="stat-label">Total Applications</div>
+      <div class="stat-label">Total Student Applications</div>
     </div>
   </div>
 
-  <!-- Quick Actions -->
+  <!-- Quick Actions Grid -->
   <div class="grid-3 mb-5">
-    <a href="{{ url_for('admin.companies') }}" class="card text-center" style="text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-      <div style="font-size: 2rem; margin-bottom: 8px;">🏢</div>
-      <h4 style="margin-bottom: 4px;">Manage Companies</h4>
-      <p class="text-xs text-muted">Add, activate, or remove partner companies</p>
+    <a href="{{ url_for('admin.companies') }}" class="card text-center" style="text-decoration: none; border-top: 3px solid var(--color-cyan); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">🏢</div>
+      <h4 style="margin-bottom: 4px;">Manage Partner Companies</h4>
+      <p class="text-xs text-muted">Add new company accounts, set credentials, or remove companies</p>
+      <span class="btn btn-sm btn-cyan mt-2">Open Companies →</span>
     </a>
-    <a href="{{ url_for('admin.students') }}" class="card text-center" style="text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-      <div style="font-size: 2rem; margin-bottom: 8px;">👨‍🎓</div>
+    <a href="{{ url_for('admin.students') }}" class="card text-center" style="text-decoration: none; border-top: 3px solid #6366f1; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">👨‍🎓</div>
       <h4 style="margin-bottom: 4px;">Manage Students</h4>
-      <p class="text-xs text-muted">View and manage student accounts</p>
+      <p class="text-xs text-muted">View student profiles, universities, departments, and account status</p>
+      <span class="btn btn-sm btn-outline mt-2">Open Students →</span>
     </a>
-    <a href="{{ url_for('admin.internships') }}" class="card text-center" style="text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-      <div style="font-size: 2rem; margin-bottom: 8px;">📋</div>
-      <h4 style="margin-bottom: 4px;">All Listings</h4>
-      <p class="text-xs text-muted">Overview of all internship postings</p>
+    <a href="{{ url_for('admin.internships') }}" class="card text-center" style="text-decoration: none; border-top: 3px solid var(--color-success); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">📋</div>
+      <h4 style="margin-bottom: 4px;">All Internship Listings</h4>
+      <p class="text-xs text-muted">Overview of all active and past postings across partner companies</p>
+      <span class="btn btn-sm btn-ghost mt-2">View Postings →</span>
     </a>
   </div>
 
   <div class="grid-2 gap-4">
-    <!-- Recent Applications -->
+    <!-- Recent Applications Overview -->
     <div class="card p-0" style="overflow: hidden;">
       <div class="p-3 font-bold flex-between" style="border-bottom: 1px solid var(--border);">
-        <span>Recent Applications</span>
-        <span class="text-xs text-muted">Latest 8</span>
+        <span>System Applications Overview</span>
+        <span class="text-xs text-muted">Latest 8 Submissions</span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Student</th>
-              <th>Internship</th>
-              <th>Status</th>
+              <th>Company & Internship</th>
+              <th>Status Decided by Company</th>
             </tr>
           </thead>
           <tbody>
             {% for app in recent_apps %}
               <tr>
-                <td>{{ app.student.full_name or 'N/A' }}</td>
-                <td class="text-xs">{{ app.internship.title }}<br><span class="text-muted">{{ app.internship.company.company_name }}</span></td>
-                <td><span class="status-badge status-{{ app.status }}">{{ app.status }}</span></td>
+                <td>
+                  <div class="font-bold">{{ app.student.full_name or 'Student' }}</div>
+                  <div class="text-xs text-muted">{{ app.student.department or 'N/A' }}</div>
+                </td>
+                <td class="text-xs">
+                  <strong>{{ app.internship.company.company_name }}</strong><br>
+                  <span class="text-muted">{{ app.internship.title }}</span>
+                </td>
+                <td>
+                  {% if app.status == 'accepted' %}
+                    <span class="status-badge status-accepted">✅ Approved</span>
+                  {% elif app.status == 'rejected' %}
+                    <span class="status-badge status-rejected">❌ Declined</span>
+                  {% elif app.status == 'interview' %}
+                    <span class="status-badge status-interview">💬 Interview</span>
+                  {% else %}
+                    <span class="status-badge status-pending">⏳ Pending Company</span>
+                  {% endif %}
+                </td>
               </tr>
             {% else %}
-              <tr><td colspan="3" class="text-center text-muted">No applications yet</td></tr>
+              <tr><td colspan="3" class="text-center text-muted p-4">No applications submitted yet</td></tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Recent Internships -->
+    <!-- Recent Postings Overview -->
     <div class="card p-0" style="overflow: hidden;">
       <div class="p-3 font-bold flex-between" style="border-bottom: 1px solid var(--border);">
         <span>Recently Posted Internships</span>
-        <span class="text-xs text-muted">Latest 8</span>
+        <span class="text-xs text-muted">Latest 8 Postings</span>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Company</th>
+              <th>Internship Title</th>
+              <th>Company Admin</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {% for i in recent_internships %}
               <tr>
-                <td><a href="{{ url_for('internship.detail', internship_id=i.id) }}">{{ i.title }}</a></td>
-                <td class="text-xs text-muted">{{ i.company.company_name }}</td>
+                <td>
+                  <div class="font-bold">{{ i.title }}</div>
+                  <div class="text-xs text-muted">{{ i.field or 'General' }} • {{ i.work_type }}</div>
+                </td>
+                <td class="text-xs">
+                  <strong>{{ i.company.company_name }}</strong><br>
+                  <span class="text-muted">{{ i.company.user.email }}</span>
+                </td>
                 <td>
                   {% if i.is_active %}
-                    <span class="status-badge status-accepted">Active</span>
+                    <span class="status-badge status-active">Active</span>
                   {% else %}
-                    <span class="status-badge status-rejected">Inactive</span>
+                    <span class="status-badge status-inactive">Closed</span>
                   {% endif %}
                 </td>
               </tr>
             {% else %}
-              <tr><td colspan="3" class="text-center text-muted">No internships posted yet</td></tr>
+              <tr><td colspan="3" class="text-center text-muted p-4">No internships posted yet</td></tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
+
 </div>
 {% endblock %}

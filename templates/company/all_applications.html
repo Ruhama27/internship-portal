@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block title %}All Student Applications — Company Admin{% endblock %}
+
+{% block content %}
+<div class="container section-sm">
+
+  <!-- Header -->
+  <div class="page-header flex-between">
+    <div>
+      <div class="flex-gap mb-1">
+        <span class="tag cyan font-bold">🏢 COMPANY ADMIN</span>
+        <span class="text-xs text-muted">Debre Berhan University Portal</span>
+      </div>
+      <h2>Student Applications Pipeline</h2>
+      <p class="text-sm text-muted">
+        Review student applications for <strong>{{ company.company_name }}</strong> and approve, decline, or interview candidates.
+      </p>
+    </div>
+    <a href="{{ url_for('company.dashboard') }}" class="btn btn-ghost">
+      ← Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Status Filter Tabs -->
+  <div class="flex-between flex-wrap gap-3 mb-4 p-3" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);">
+    <div class="flex-gap flex-wrap">
+      <a href="{{ url_for('company.all_applications', status='all', internship_id=current_internship_id) }}" 
+         class="btn btn-sm {% if current_status == 'all' %}btn-primary{% else %}btn-ghost{% endif %}">
+        All Applications ({{ counts.all }})
+      </a>
+      <a href="{{ url_for('company.all_applications', status='pending', internship_id=current_internship_id) }}" 
+         class="btn btn-sm {% if current_status == 'pending' %}btn-warning{% else %}btn-ghost{% endif %}">
+        ⏳ Pending Decision ({{ counts.pending }})
+      </a>
+      <a href="{{ url_for('company.all_applications', status='accepted', internship_id=current_internship_id) }}" 
+         class="btn btn-sm {% if current_status == 'accepted' %}btn-primary{% else %}btn-ghost{% endif %}" style="{% if current_status == 'accepted' %}background:#10b981; border-color:#10b981;{% endif %}">
+        ✅ Approved ({{ counts.accepted }})
+      </a>
+      <a href="{{ url_for('company.all_applications', status='rejected', internship_id=current_internship_id) }}" 
+         class="btn btn-sm {% if current_status == 'rejected' %}btn-danger{% else %}btn-ghost{% endif %}">
+        ❌ Declined ({{ counts.rejected }})
+      </a>
+      <a href="{{ url_for('company.all_applications', status='interview', internship_id=current_internship_id) }}" 
+         class="btn btn-sm {% if current_status == 'interview' %}btn-cyan{% else %}btn-ghost{% endif %}">
+        💬 Interview ({{ counts.interview }})
+      </a>
+    </div>
+
+    <!-- Internship Filter Dropdown -->
+    {% if internships %}
+      <div>
+        <form method="GET" action="{{ url_for('company.all_applications') }}" style="display:inline-flex; align-items:center; gap:8px;">
+          <input type="hidden" name="status" value="{{ current_status }}">
+          <label class="text-xs text-muted" style="white-space: nowrap;">Filter by Listing:</label>
+          <select name="internship_id" class="form-control text-xs" style="padding: 4px 8px; width: auto;" onchange="this.form.submit()">
+            <option value="">All Listings</option>
+            {% for i in internships %}
+              <option value="{{ i.id }}" {% if current_internship_id == i.id %}selected{% endif %}>
+                {{ i.title }}
+              </option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Applications List -->
+  {% if applications %}
+    <div class="flex-flex-column gap-3">
+      {% for app in applications %}
+        {% set s = app.student %}
+        <div class="card mb-3 p-4" style="background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid {% if app.status == 'accepted' %}#10b981{% elif app.status == 'rejected' %}#ef4444{% elif app.status == 'interview' %}#0ea5e9{% else %}#f59e0b{% endif %}; border-radius: var(--radius-md);">
+          
+          <div class="flex-between flex-wrap gap-3 mb-3">
+            <div class="flex-gap">
+              <div class="company-logo" style="width:48px; height:48px; background: var(--gradient-btn-cyan); font-size:1.2rem;">
+                {{ s.full_name[0] if s.full_name else 'S' }}
+              </div>
+              <div>
+                <div class="flex-gap align-center">
+                  <h3 style="margin:0; font-size:1.15rem;">{{ s.full_name or 'Student' }}</h3>
+                  {% if app.status == 'pending' %}
+                    <span class="status-badge status-pending">⏳ Pending Review</span>
+                  {% elif app.status == 'accepted' %}
+                    <span class="status-badge status-accepted">✅ Approved</span>
+                  {% elif app.status == 'rejected' %}
+                    <span class="status-badge status-rejected">❌ Declined</span>
+                  {% elif app.status == 'interview' %}
+                    <span class="status-badge status-interview">💬 Interview</span>
+                  {% endif %}
+                </div>
+                <p class="text-xs text-muted" style="margin:2px 0 0 0;">
+                  Applied for: <strong class="text-cyan">{{ app.internship.title }}</strong> &bull; Applied: {{ app.applied_at.strftime('%b %d, %Y at %H:%M') }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Decision Form -->
+            <div class="flex-gap flex-wrap">
+              <form method="POST" action="{{ url_for('company.update_status', app_id=app.id) }}" style="display:inline; margin:0;">
+                <input type="hidden" name="status" value="accepted">
+                <input type="hidden" name="next" value="{{ request.full_path }}">
+                <button type="submit" class="btn btn-sm {% if app.status == 'accepted' %}btn-primary{% else %}btn-outline{% endif %}" 
+                        style="{% if app.status == 'accepted' %}background:#10b981; border-color:#10b981; color:#fff;{% else %}color:#10b981; border-color:#10b981;{% endif %}"
+                        onclick="return confirm('Approve {{ s.full_name }} for this internship?');">
+                  ✅ Approve (Accept)
+                </button>
+              </form>
+
+              <form method="POST" action="{{ url_for('company.update_status', app_id=app.id) }}" style="display:inline; margin:0;">
+                <input type="hidden" name="status" value="rejected">
+                <input type="hidden" name="next" value="{{ request.full_path }}">
+                <button type="submit" class="btn btn-sm {% if app.status == 'rejected' %}btn-danger{% else %}btn-ghost{% endif %}" 
+                        style="{% if app.status == 'rejected' %}background:rgba(239,68,68,0.2); color:#f87171; border:1px solid #ef4444;{% else %}color:#ef4444; border:1px solid rgba(239,68,68,0.3);{% endif %}"
+                        onclick="return confirm('Decline {{ s.full_name }}\'s application?');">
+                  ❌ Decline
+                </button>
+              </form>
+
+              <form method="POST" action="{{ url_for('company.update_status', app_id=app.id) }}" style="display:inline; margin:0;">
+                <input type="hidden" name="status" value="interview">
+                <input type="hidden" name="next" value="{{ request.full_path }}">
+                <button type="submit" class="btn btn-ghost btn-sm" style="border: 1px solid var(--border);">
+                  💬 Interview
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Student Profile & Contact Grid -->
+          <div class="grid-2 gap-3 mb-3 p-3" style="background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+            <div>
+              <div class="text-xs font-bold text-muted mb-1">🎓 ACADEMIC BACKGROUND</div>
+              <div class="text-xs" style="line-height: 1.6;">
+                <div><strong>University:</strong> {{ s.university or 'Debre Berhan University' }}</div>
+                <div><strong>Department:</strong> {{ s.department or 'N/A' }} ({{ s.field_of_study or 'General' }})</div>
+                <div><strong>Year of Study:</strong> Year {{ s.year_of_study or '?' }} {% if s.gpa %}&bull; <strong>GPA:</strong> {{ s.gpa }}{% endif %}</div>
+                {% if s.location %}<div><strong>Location:</strong> {{ s.location }}</div>{% endif %}
+              </div>
+            </div>
+
+            <div>
+              <div class="text-xs font-bold text-muted mb-1">📞 CONTACT & DOCUMENTS</div>
+              <div class="text-xs" style="line-height: 1.6;">
+                <div><strong>Email:</strong> <a href="mailto:{{ s.user.email }}">{{ s.user.email }}</a></div>
+                {% if s.phone %}<div><strong>Phone:</strong> {{ s.phone }}</div>{% endif %}
+                <div class="flex-gap mt-2">
+                  {% if s.cv_filename %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ s.cv_filename) }}" target="_blank" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 0.75rem;">
+                      📄 View Student CV
+                    </a>
+                  {% else %}
+                    <span class="text-muted">No CV attached</span>
+                  {% endif %}
+
+                  {% if s.essay_filename %}
+                    <a href="{{ url_for('static', filename='uploads/' ~ s.essay_filename) }}" target="_blank" class="btn btn-ghost btn-sm" style="padding: 4px 10px; font-size: 0.75rem; border:1px solid var(--border);">
+                      📝 View Essay
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills -->
+          {% if s.skills %}
+            <div class="mb-3">
+              <span class="text-xs font-bold text-muted mr-2">Skills:</span>
+              {% for skill in s.skills %}
+                <span class="tag primary" style="font-size: 0.75rem;">{{ skill.name }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Cover Note -->
+          {% if app.cover_letter %}
+            <div class="text-xs p-3 mb-2" style="background: rgba(14,165,233,0.05); border-left: 3px solid var(--color-cyan); border-radius: var(--radius-sm);">
+              <strong>Student Cover Note:</strong>
+              <div class="mt-1" style="color: #334155; font-style: italic;">"{{ app.cover_letter }}"</div>
+            </div>
+          {% endif %}
+
+          <div class="flex-between pt-2 text-xs text-muted" style="border-top: 1px solid var(--border);">
+            <span>Application ID: #{{ app.id }}</span>
+            <a href="mailto:{{ s.user.email }}?subject=Internship Application for {{ app.internship.title }} at {{ company.company_name }}" class="btn btn-cyan btn-sm">
+              ✉️ Email Candidate Directly
+            </a>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state p-5 text-center">
+      <div style="font-size: 2.5rem; margin-bottom: 8px;">📭</div>
+      <h3>No applications found</h3>
+      <p class="text-sm text-muted">
+        {% if current_status != 'all' %}
+          No applications currently match the "<strong>{{ current_status.title() }}</strong>" filter.
+        {% else %}
+          Students have not applied to your internships yet. Once students submit their applications, they will appear here for you to approve or decline.
+        {% endif %}
+      </p>
+      {% if current_status != 'all' %}
+        <a href="{{ url_for('company.all_applications', status='all') }}" class="btn btn-primary btn-sm mt-3">
+          Show All Applications
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

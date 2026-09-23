@@ -1,32 +1,48 @@
 # Debre Berhan University — Online Student Internship Matching Platform 🎓
 
-A full-stack web application designed for students and employers. The platform helps students discover suitable company internships through AI-assisted skill matching, complete with visual match breakdown progress bars, CV/Essay upload tools, application tracking, and an employer portal for internship posting and applicant management.
+A full-stack web application designed for Debre Berhan University students and partner employers. The platform coordinates the internship lifecycle with 3 distinctly differentiated user roles, separate dashboards, unique credentials, and dedicated workflows.
 
 ---
 
-## ✨ Features
+## 👥 Three Differentiated User Roles
 
-- 🎓 **Student Self-Service Portal**:
-  - Profile setup with university details, field of study, expected graduation year, and GPA.
-  - Interactive skill selector (Programming, Web, Database, DevOps, Data Science, etc.) and career interest tags.
-  - CV (`.pdf`/`.docx`) and Application Essay upload options.
-  - Profile completion strength meter.
+### 1. 🏛️ University Administrator (Debre Berhan University)
+- **Role & Access**: Platform supervisor managing the university's corporate partnership network.
+- **Dedicated Dashboard**: Platform metrics, student registries, and partner company directory.
+- **Key Capabilities**:
+  - **Add Partner Companies**: Creates company accounts with company work email and password.
+  - **Remove / Deactivate Companies**: Permanently remove or temporarily deactivate company access.
+  - **Reset Company Password**: Reset credentials for partner companies when requested.
+  - **Manage Students**: View registered student accounts, departments, and account statuses.
+  - **Listing Oversight**: Global directory of all internship listings across companies.
+- **Login Credentials**: `admin@dbu.edu.et` (or `admin@internmatch.com`) / `admin123`
 
-- 🤖 **AI Matching Engine**:
-  - Multi-weighted scoring model: **40% Skill Overlap** + **30% Academic Field Alignment** + **20% Career Interests** + **10% Seniority Bonus**.
-  - **"Why Am I Matched?" Breakdown**: Visual score bars for Education, Skills, Interests, and Seniority with dynamic match explanations.
+---
 
-- 🏢 **Employer / Company Portal**:
-  - Company registration and profile management.
-  - Internship listing creation (required skills, preferred skills, location, work type: `Remote`/`Hybrid`/`On-site`, openings, deadlines).
-  - Applicant pipeline management: View student profiles, match %, CV/essay files, cover notes, update status (`Pending`, `Interview`, `Accepted`, `Rejected`), and send direct application emails.
+### 2. 🏢 Company Administrator (Partner Employer)
+- **Role & Access**: Individual employer representative authorized by the university.
+- **Dedicated Dashboard**: Applicant decision center, listing performance, and company settings.
+- **Key Capabilities**:
+  - **Approve or Decline Applications**: Review student candidate profiles, academic field, year, GPA, skills, and CVs, and directly **Approve (Accept)** or **Decline (Reject)** applications with one click.
+  - **Interview Management**: Move candidates to the interview stage or email them directly.
+  - **Post & Edit Internships**: Create listings with required skills, openings, deadlines, work type (Remote/Hybrid/On-site), and Ethiopian locations.
+  - **Company Settings**: Update profile overview and independently manage company password.
+- **Login Credentials**:
+  - `abc@techcorp.com` / `company123` (ABC Technology)
+  - `xyz@solutions.com` / `company123` (XYZ Solutions)
+  - `nova@digital.com` / `company123` (Nova Digital Agency)
 
-- 🔍 **Search, Filter & Bookmarks**:
-  - Multi-criteria filtering by keyword, field, location, work type, and required skills.
-  - Save/bookmark internships to a dedicated collection.
+---
 
-- 📊 **Admin Dashboard**:
-  - Platform-wide statistics, user activation/deactivation management, and listing oversight.
+### 3. 👨‍🎓 Student
+- **Role & Access**: Debre Berhan University students seeking internship opportunities.
+- **Dedicated Dashboard**: Active applications tracker, saved bookmarks, and profile status.
+- **Key Capabilities**:
+  - **Self-Registration**: Register with student ID, department, university, and year of study.
+  - **Profile & Skills**: Select technical skills, career interests, and upload CV (`.pdf`/`.docx`) and essays.
+  - **Browse & Search**: Filter internships by keyword, field, work type, and Ethiopian cities.
+  - **Application Tracking**: Real-time status updates as Company Admins review, approve, or decline applications.
+- **Login Credentials**: `ruhama@student.com` / `student123` (or self-register a new account)
 
 ---
 
@@ -60,19 +76,19 @@ Open your browser and navigate to `http://127.0.0.1:5000/`.
 
 ---
 
-## 🔑 Demo Credentials
+## 🔑 Demo Credentials Summary
 
-| Role | Email | Password | Details |
+| Role | Work / Student Email | Password | Primary Dashboard Actions |
 |---|---|---|---|
-| **Student** | `ruhama@student.com` | `student123` | Debre Berhan University 3rd Year Software Engineering Student |
-| **Company A** | `abc@techcorp.com` | `company123` | ABC Technology |
-| **Company B** | `xyz@solutions.com` | `company123` | XYZ Solutions |
-| **Admin** | `admin@internmatch.com` | `admin123` | System Administrator |
+| **🏛️ University Admin** | `admin@dbu.edu.et` | `admin123` | Add & Remove Companies, Student Directory, Platform Oversight |
+| **🏢 Company Admin (ABC)** | `abc@techcorp.com` | `company123` | Approve / Decline Student Applications, Post Internships |
+| **🏢 Company Admin (XYZ)** | `xyz@solutions.com` | `company123` | Approve / Decline Student Applications, Post Internships |
+| **👨‍🎓 Student** | `ruhama@student.com` | `student123` | Browse Internships, Upload CV, Apply & Track Status |
 
 ---
 
-## 🛠️ Built With
+## 🛠️ Technology Stack
 
-- **Backend**: Python 3.x, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF
+- **Backend**: Python 3.x, Flask, Flask-SQLAlchemy, Flask-Login
 - **Database**: SQLite (SQLAlchemy ORM)
-- **Frontend**: Vanilla HTML5, CSS3, JavaScript (Debre Berhan University Portal theme)
+- **Frontend**: Responsive HTML5, Vanilla CSS3, JavaScript (Debre Berhan University Portal styling)

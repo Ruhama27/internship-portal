@@ -2,7 +2,7 @@
 seed.py — Populates the database with initial data.
 Run automatically on first startup (if tables are empty).
 """
-from models import db, User, StudentProfile, CompanyProfile, Skill, Interest, Internship
+from models import db, User, StudentProfile, CompanyProfile, Skill, Interest, Internship, Application
 from datetime import date
 
 
@@ -140,10 +140,14 @@ def seed_data():
 
     db.session.flush()
 
-    # Admin user
-    admin = User(email='admin@internmatch.com', role='admin')
-    admin.set_password('admin123')
-    db.session.add(admin)
+    # University Admin user (Debre Berhan University)
+    admin_dbu = User(email='admin@dbu.edu.et', role='admin')
+    admin_dbu.set_password('admin123')
+    db.session.add(admin_dbu)
+
+    admin_legacy = User(email='admin@internmatch.com', role='admin')
+    admin_legacy.set_password('admin123')
+    db.session.add(admin_legacy)
 
     # Demo student
     student_user = User(email='ruhama@student.com', role='student')
@@ -335,10 +339,33 @@ def seed_data():
         internship.tags             = [interest_map[t] for t in idata['tags']   if t in interest_map]
         db.session.add(internship)
 
+    db.session.flush()
+
+    # Seed initial demo applications from student to companies
+    abc_internship = Internship.query.filter_by(company_id=abc.id).first()
+    if abc_internship:
+        app1 = Application(
+            student_id   = student_profile.id,
+            internship_id= abc_internship.id,
+            cover_letter = 'Dear ABC Technology hiring team, I am an enthusiastic 3rd-year Software Engineering student at Debre Berhan University. I have hands-on experience in full-stack web development and would love to contribute to your team.',
+            status       = 'pending',
+        )
+        db.session.add(app1)
+
+    xyz_internship = Internship.query.filter_by(company_id=xyz.id).first()
+    if xyz_internship:
+        app2 = Application(
+            student_id   = student_profile.id,
+            internship_id= xyz_internship.id,
+            cover_letter = 'Hello XYZ Solutions, I am passionate about data analytics and machine learning applications. I have built models using Python, TensorFlow, and Pandas during my coursework at DBU.',
+            status       = 'accepted',
+        )
+        db.session.add(app2)
+
     db.session.commit()
     print("[+] Database seeded successfully!")
-    print("\n[+] Demo credentials:")
-    print("   Admin:   admin@internmatch.com    / admin123")
-    print("   Student: ruhama@student.com       / student123")
-    print("   Company: abc@techcorp.com         / company123")
-    print("   Company: xyz@solutions.com        / company123")
+    print("\n[+] Demo credentials for 3 distinct roles:")
+    print("   🏛️ University Admin: admin@dbu.edu.et       / admin123  (or admin@internmatch.com)")
+    print("   🏢 Company Admin 1:   abc@techcorp.com        / company123 (ABC Technology)")
+    print("   🏢 Company Admin 2:   xyz@solutions.com       / company123 (XYZ Solutions)")
+    print("   👨‍🎓 Student:           ruhama@student.com      / student123")

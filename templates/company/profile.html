@@ -67,5 +67,31 @@
       </div>
     </form>
   </div>
+
+  <!-- ── Change Login Password Card ──────────────────────────────── -->
+  <div class="card card-glow mt-4">
+    <div class="page-header flex-between" style="border:none; margin:0; padding-bottom: 16px;">
+      <div>
+        <h3>🔐 Change Company Admin Password</h3>
+        <p class="text-sm text-muted">Update the password used to log in as Company Admin (Work Email: <strong>{{ current_user.email }}</strong>)</p>
+      </div>
+    </div>
+
+    <form method="POST">
+      <input type="hidden" name="action" value="password">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">New Password *</label>
+          <input type="password" name="new_password" class="form-control" placeholder="••••••••" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password *</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" minlength="6" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-2">Update Password →</button>
+    </form>
+  </div>
+
 </div>
 {% endblock %}

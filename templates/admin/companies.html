@@ -42,7 +42,7 @@
               &nbsp;•&nbsp; 📋 {{ company.internships|length }} listing(s)
             </div>
 
-            <div class="flex-gap">
+            <div class="flex-gap flex-wrap" style="position: relative;">
               <!-- Toggle Active/Inactive -->
               <form method="POST" action="{{ url_for('admin.toggle_company', company_id=company.id) }}" style="margin:0;">
                 {% if company.user.is_active %}
@@ -55,6 +55,19 @@
                   </button>
                 {% endif %}
               </form>
+
+              <!-- Reset Password -->
+              <details style="display:inline-block;">
+                <summary class="btn btn-ghost btn-sm" style="cursor:pointer; list-style:none;">
+                  🔑 Reset Password
+                </summary>
+                <div style="position:absolute; left:0; margin-top:4px; background:var(--bg-card); border:1px solid var(--border); padding:8px 10px; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.2); z-index:20; min-width: 220px;">
+                  <form method="POST" action="{{ url_for('admin.reset_company_password', company_id=company.id) }}" style="display:flex; gap:6px; margin:0;">
+                    <input type="text" name="new_password" class="form-control text-xs" placeholder="New password" required style="padding:4px 8px; flex:1;">
+                    <button type="submit" class="btn btn-primary btn-sm" style="padding:4px 8px; font-size:0.75rem;">Save</button>
+                  </form>
+                </div>
+              </details>
 
               <!-- Remove Company -->
               <form method="POST" action="{{ url_for('admin.remove_company', company_id=company.id) }}" style="margin:0;">
