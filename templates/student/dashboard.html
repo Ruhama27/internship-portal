@@ -20,7 +20,7 @@
           <span class="font-bold gradient-text">{{ student.completion_percent }}%</span>
         </div>
         <div class="completion-bar">
-          <div class="completion-fill" style="width: {{ student.completion_percent }}%;"></div>
+          <div class="completion-fill" style="width: {{ student.completion_percent }};"></div>
         </div>
         {% if student.completion_percent < 80 %}
           <a href="{{ url_for('student.profile') }}" class="text-xs text-warning mt-1 inline-block">⚠️ Add skills & CV to complete your profile →</a>
@@ -53,18 +53,18 @@
     </div>
   </div>
 
-  <!-- Recommendations Section -->
+  <!-- Latest Internships Section -->
   <div class="flex-between mb-4">
     <div>
-      <h2>Recommended for You</h2>
-      <p class="text-sm">Matched based on your skills, field of study, and career interests</p>
+      <h2>Latest Internships</h2>
+      <p class="text-sm">Recently posted opportunities — find your perfect match</p>
     </div>
     <a href="{{ url_for('internship.search') }}" class="btn btn-outline btn-sm">Search All Listings →</a>
   </div>
 
-  {% if recommendations %}
+  {% if latest_internships %}
     <div class="grid-3">
-      {% for internship, match in recommendations %}
+      {% for internship in latest_internships %}
         <div class="internship-card fade-in-card">
           <div class="flex-between mb-3">
             <div class="flex-gap">
@@ -74,35 +74,23 @@
                 <p class="text-xs">{{ internship.company.company_name }}</p>
               </div>
             </div>
-
-            <!-- Match Score Badge -->
-            <div class="match-badge {% if match.score >= 80 %}high{% elif match.score >= 60 %}medium{% else %}low{% endif %}">
-              ⚡ {{ match.score }}% Match
-            </div>
+            <span class="work-chip work-{{ internship.work_type }}">{{ internship.work_type }}</span>
           </div>
 
           <p class="text-sm mb-3 text-muted" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
             {{ internship.description }}
           </p>
 
-          <!-- Why Matched Snippet -->
-          <div class="mb-3 p-2 text-xs" style="background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary-lt);">
-            💡 {{ match.explanation }}
-          </div>
-
           <!-- Required skills -->
           <div class="flex-wrap gap-1 mb-3">
-            {% for skill in match.matched_required %}
-              <span class="tag green">✓ {{ skill.name }}</span>
-            {% endfor %}
-            {% for skill in match.missing_required[:2] %}
-              <span class="tag yellow">⚠ {{ skill.name }}</span>
+            {% for skill in internship.required_skills[:4] %}
+              <span class="tag primary">{{ skill.name }}</span>
             {% endfor %}
           </div>
 
           <div class="flex-between pt-3" style="border-top: 1px solid var(--border);">
-            <span class="work-chip work-{{ internship.work_type }}">{{ internship.work_type }}</span>
-            <a href="{{ url_for('internship.detail', internship_id=internship.id) }}" class="btn btn-primary btn-sm">View Details & Apply →</a>
+            <span class="text-xs text-muted">📍 {{ internship.location or 'Remote' }}</span>
+            <a href="{{ url_for('internship.detail', internship_id=internship.id) }}" class="btn btn-primary btn-sm">View & Apply →</a>
           </div>
         </div>
       {% endfor %}
@@ -110,9 +98,9 @@
   {% else %}
     <div class="empty-state">
       <div class="empty-icon">🔍</div>
-      <h3 class="empty-title">No recommendations yet</h3>
-      <p class="empty-desc">Complete your profile skills and interests to see matched internships.</p>
-      <a href="{{ url_for('student.profile') }}" class="btn btn-primary">Complete Profile Now</a>
+      <h3 class="empty-title">No internships posted yet</h3>
+      <p class="empty-desc">Check back soon — companies are posting new opportunities regularly.</p>
+      <a href="{{ url_for('internship.search') }}" class="btn btn-primary">Browse Internships</a>
     </div>
   {% endif %}
 

@@ -46,13 +46,7 @@
         <h4 class="mb-2">Required Skills</h4>
         <div class="flex-wrap gap-1 mb-4">
           {% for skill in internship.required_skills %}
-            {% if match and skill in match.matched_required %}
-              <span class="tag green" style="font-size:0.85rem; padding: 6px 14px;">✓ {{ skill.name }} (You have this)</span>
-            {% elif match %}
-              <span class="tag yellow" style="font-size:0.85rem; padding: 6px 14px;">⚠ {{ skill.name }} (Missing)</span>
-            {% else %}
-              <span class="tag primary" style="font-size:0.85rem; padding: 6px 14px;">{{ skill.name }}</span>
-            {% endif %}
+            <span class="tag primary" style="font-size:0.85rem; padding: 6px 14px;">{{ skill.name }}</span>
           {% endfor %}
         </div>
 
@@ -61,11 +55,7 @@
           <h4 class="mb-2">Preferred / Bonus Skills</h4>
           <div class="flex-wrap gap-1 mb-4">
             {% for skill in internship.preferred_skills %}
-              {% if match and skill in match.matched_preferred %}
-                <span class="tag cyan" style="font-size:0.85rem; padding: 6px 14px;">⭐ {{ skill.name }} (Match)</span>
-              {% else %}
-                <span class="tag" style="font-size:0.85rem; padding: 6px 14px;">{{ skill.name }}</span>
-              {% endif %}
+              <span class="tag" style="font-size:0.85rem; padding: 6px 14px;">{{ skill.name }}</span>
             {% endfor %}
           </div>
         {% endif %}
@@ -81,65 +71,9 @@
       </div>
     </div>
 
-    <!-- Sidebar: AI Match & Apply Column -->
+    <!-- Sidebar: Apply Column -->
     <div>
       {% if current_user.is_authenticated and current_user.role == 'student' %}
-        <!-- AI WHY AM I MATCHED? CARD -->
-        {% if match %}
-          <div class="match-breakdown mb-4">
-            <div class="text-xs font-bold text-muted uppercase mb-1">Why this internship matches you</div>
-            <div class="match-header">
-              <div class="match-big-score">{{ match.score }}%</div>
-              <div class="text-xs text-muted">Overall AI Match Confidence Score</div>
-            </div>
-
-            <!-- Breakdown Bars -->
-            <div class="progress-bar-wrap">
-              <div class="progress-bar-label">
-                <span>Education / Field</span>
-                <span class="font-bold">{{ match.field_score }}%</span>
-              </div>
-              <div class="progress-bar-track">
-                <div class="progress-bar-fill green" style="width: {{ match.field_score }}%;"></div>
-              </div>
-            </div>
-
-            <div class="progress-bar-wrap">
-              <div class="progress-bar-label">
-                <span>Skills Requirement</span>
-                <span class="font-bold">{{ match.skill_score }}%</span>
-              </div>
-              <div class="progress-bar-track">
-                <div class="progress-bar-fill" style="width: {{ match.skill_score }}%;"></div>
-              </div>
-            </div>
-
-            <div class="progress-bar-wrap">
-              <div class="progress-bar-label">
-                <span>Career Interests</span>
-                <span class="font-bold">{{ match.interest_score }}%</span>
-              </div>
-              <div class="progress-bar-track">
-                <div class="progress-bar-fill cyan" style="width: {{ match.interest_score }}%;"></div>
-              </div>
-            </div>
-
-            <div class="progress-bar-wrap mb-3">
-              <div class="progress-bar-label">
-                <span>Year of Study Bonus</span>
-                <span class="font-bold">{{ match.year_score }}%</span>
-              </div>
-              <div class="progress-bar-track">
-                <div class="progress-bar-fill yellow" style="width: {{ match.year_score }}%;"></div>
-              </div>
-            </div>
-
-            <p class="text-xs p-2" style="background: rgba(255,255,255,0.04); border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary-lt);">
-              💡 <strong>Match Explanation:</strong> {{ match.explanation }}
-            </p>
-          </div>
-        {% endif %}
-
         <!-- APPLICATION CARD -->
         <div class="card card-glow">
           <h3 class="card-title mb-3">Apply Now</h3>
@@ -173,7 +107,7 @@
       {% elif not current_user.is_authenticated %}
         <div class="card text-center">
           <h3 class="mb-2">Log in to Apply</h3>
-          <p class="text-xs text-muted mb-4">Register or log in as a student to see your personalized AI match score and apply with one click.</p>
+          <p class="text-xs text-muted mb-4">Register or log in as a student to apply for this internship.</p>
           <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-block mb-2">Log In to Apply</a>
           <a href="{{ url_for('auth.register_student') }}" class="btn btn-ghost btn-block btn-sm">Create Student Account</a>
         </div>

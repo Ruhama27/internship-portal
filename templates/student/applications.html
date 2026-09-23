@@ -19,7 +19,6 @@
             <tr>
               <th>Internship / Company</th>
               <th>Applied Date</th>
-              <th>Match Score</th>
               <th>Status</th>
               <th>Contact Email</th>
             </tr>
@@ -33,11 +32,6 @@
                 </td>
                 <td>
                   <span class="text-sm">{{ app.applied_at.strftime('%b %d, %Y') }}</span>
-                </td>
-                <td>
-                  <span class="match-badge {% if app.match_score >= 80 %}high{% elif app.match_score >= 60 %}medium{% else %}low{% endif %}">
-                    ⚡ {{ app.match_score or 'N/A' }}%
-                  </span>
                 </td>
                 <td>
                   <span class="status-badge status-{{ app.status }}">{{ app.status }}</span>

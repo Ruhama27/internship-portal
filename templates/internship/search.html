@@ -8,7 +8,7 @@
   <div class="page-header flex-between">
     <div>
       <h2>Find Internships</h2>
-      <p class="text-sm">Filter by field, skills, work type, or location with real-time AI match scoring</p>
+      <p class="text-sm">Filter by field, skills, work type, or location</p>
     </div>
   </div>
 
@@ -100,15 +100,12 @@
     <!-- Main Results Column -->
     <main>
       <div class="flex-between mb-3 text-xs text-muted">
-        <span>Found {{ results|length }} internship opportunity(ies)</span>
-        {% if current_user.is_authenticated and current_user.role == 'student' %}
-          <span class="gradient-text font-bold">⚡ Sorted by AI Match Score</span>
-        {% endif %}
+        <span>Found {{ internships|length }} internship opportunity(ies)</span>
       </div>
 
-      {% if results %}
+      {% if internships %}
         <div class="flex-flex-column gap-3">
-          {% for internship, match in results %}
+          {% for internship in internships %}
             <div class="internship-card fade-in-card mb-3">
               <div class="flex-between mb-2">
                 <div class="flex-gap">
@@ -119,13 +116,7 @@
                   </div>
                 </div>
 
-                {% if match %}
-                  <div class="match-badge {% if match.score >= 80 %}high{% elif match.score >= 60 %}medium{% else %}low{% endif %}">
-                    ⚡ {{ match.score }}% Match
-                  </div>
-                {% else %}
-                  <span class="work-chip work-{{ internship.work_type }}">{{ internship.work_type }}</span>
-                {% endif %}
+                <span class="work-chip work-{{ internship.work_type }}">{{ internship.work_type }}</span>
               </div>
 
               <p class="text-sm mb-3 text-muted" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
@@ -135,11 +126,7 @@
               <!-- Skills required -->
               <div class="flex-wrap gap-1 mb-3">
                 {% for skill in internship.required_skills %}
-                  {% if match and skill in match.matched_required %}
-                    <span class="tag green">✓ {{ skill.name }}</span>
-                  {% else %}
-                    <span class="tag primary">{{ skill.name }}</span>
-                  {% endif %}
+                  <span class="tag primary">{{ skill.name }}</span>
                 {% endfor %}
               </div>
 
@@ -148,7 +135,7 @@
                   <span>🎓 Field: {{ internship.field or 'General' }}</span>
                   <span>📅 Deadline: {{ internship.deadline.strftime('%b %d, %Y') if internship.deadline else 'Open' }}</span>
                 </div>
-                <a href="{{ url_for('internship.detail', internship_id=internship.id) }}" class="btn btn-primary btn-sm">View Details & Match Breakdown →</a>
+                <a href="{{ url_for('internship.detail', internship_id=internship.id) }}" class="btn btn-primary btn-sm">View Details →</a>
               </div>
             </div>
           {% endfor %}

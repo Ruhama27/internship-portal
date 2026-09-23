@@ -4,7 +4,6 @@ from flask import (Blueprint, render_template, redirect, url_for,
 from flask_login import current_user
 from decorators import student_required
 from models import db, Internship, Skill, Interest, Application
-from matching import get_recommendations, compute_match
 
 student_bp = Blueprint('student', __name__)
 
@@ -26,8 +25,6 @@ def secure_name(filename):
 @student_required
 def dashboard():
     student = current_user.student_profile
-    internships = Internship.query.filter_by(is_active=True).all()
-    recommendations = get_recommendations(student, internships, limit=6)
 
     app_counts = {
         'total':     Application.query.filter_by(student_id=student.id).count(),
@@ -36,9 +33,14 @@ def dashboard():
         'accepted':  Application.query.filter_by(student_id=student.id, status='accepted').count(),
         'rejected':  Application.query.filter_by(student_id=student.id, status='rejected').count(),
     }
+    # Latest internships for the quick preview
+    latest_internships = (Internship.query
+                          .filter_by(is_active=True)
+                          .order_by(Internship.created_at.desc())
+                          .limit(6).all())
     return render_template('student/dashboard.html',
                            student=student,
-                           recommendations=recommendations,
+                           latest_internships=latest_internships,
                            app_counts=app_counts)
 
 
@@ -118,13 +120,8 @@ def applications():
 @student_required
 def saved():
     student = current_user.student_profile
-    saved_list = student.saved
-    results = []
-    for internship in saved_list:
-        match = compute_match(student, internship)
-        results.append((internship, match))
-    results.sort(key=lambda x: x[1]['score'], reverse=True)
-    return render_template('student/saved.html', student=student, results=results)
+    internships = student.saved
+    return render_template('student/saved.html', student=student, internships=internships)
 
 
 @student_bp.route('/save/<int:internship_id>', methods=['POST'])
@@ -156,18 +153,16 @@ def apply(internship_id):
         flash('You have already applied to this internship.', 'info')
         return redirect(url_for('internship.detail', internship_id=internship_id))
 
-    match = compute_match(student, internship)
     cover_letter = request.form.get('cover_letter', '')
 
     app = Application(
         student_id    = student.id,
         internship_id = internship_id,
         cover_letter  = cover_letter,
-        match_score   = match['score'],
     )
     db.session.add(app)
     db.session.commit()
-    flash(f'Application submitted! Your match score: {match["score"]}%', 'success')
+    flash('Application submitted successfully!', 'success')
     return redirect(url_for('student.applications'))
 
 
