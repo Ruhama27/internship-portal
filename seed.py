@@ -118,9 +118,24 @@ COMPANIES_DATA = [
 
 
 def seed_data():
-    """Seeds data if the database is empty."""
+    """Seeds data if the database is empty, and ensures essential admin accounts exist."""
+    # Always ensure University Admin accounts exist
+    admin_dbu = User.query.filter_by(email='admin@dbu.edu.et').first()
+    if not admin_dbu:
+        admin_dbu = User(email='admin@dbu.edu.et', role='admin')
+        admin_dbu.set_password('admin123')
+        db.session.add(admin_dbu)
+        db.session.commit()
+
+    admin_legacy = User.query.filter_by(email='admin@internmatch.com').first()
+    if not admin_legacy:
+        admin_legacy = User(email='admin@internmatch.com', role='admin')
+        admin_legacy.set_password('admin123')
+        db.session.add(admin_legacy)
+        db.session.commit()
+
     if Skill.query.count() > 0:
-        return  # Already seeded
+        return  # Full seed already completed
 
     print("[+] Seeding database...")
 
