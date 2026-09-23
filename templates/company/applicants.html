@@ -45,8 +45,9 @@
                   {% endif %}
                 </div>
                 <p class="text-xs text-muted" style="margin:2px 0 0 0;">
-                  {{ s.department or 'Department' }} &bull; {{ s.university or 'Debre Berhan University' }} (Year {{ s.year_of_study or '?' }})
-                  {% if s.gpa %} &bull; <strong>GPA:</strong> {{ s.gpa }}{% endif %}
+                  Dept: <strong style="color:var(--color-cyan);">{{ s.department or 'N/A' }}</strong> &bull; 
+                  Academic Year: <strong>Year {{ s.year_of_study or '?' }}</strong> &bull; 
+                  CGPA: <strong class="text-success">{% if s.gpa %}{{ '%.2f'|format(s.gpa) }}{% else %}N/A{% endif %}</strong>
                 </p>
               </div>
             </div>

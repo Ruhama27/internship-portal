@@ -19,6 +19,8 @@ def secure_name(filename):
     return filename.replace(' ', '_').replace('/', '_').replace('\\', '_')
 
 
+from departments_data import DBU_DEPARTMENTS, get_fields_for_department
+
 # ─── Dashboard ────────────────────────────────────────────────────────────────
 
 @student_bp.route('/dashboard')
@@ -33,13 +35,37 @@ def dashboard():
         'accepted':  Application.query.filter_by(student_id=student.id, status='accepted').count(),
         'rejected':  Application.query.filter_by(student_id=student.id, status='rejected').count(),
     }
-    # Latest internships for the quick preview
+
+    # Department detection and matching fields
+    dept_fields = get_fields_for_department(student.department)
+
+    # Internships matching student's chosen field or department fields
+    matching_internships = []
+    if student.field_of_study:
+        matching_internships = (Internship.query
+                                .filter_by(is_active=True)
+                                .filter(Internship.field.ilike(f'%{student.field_of_study}%'))
+                                .order_by(Internship.created_at.desc())
+                                .limit(6).all())
+    elif dept_fields:
+        # Match any field in student's department
+        conditions = [Internship.field.ilike(f'%{f}%') for f in dept_fields]
+        matching_internships = (Internship.query
+                                .filter_by(is_active=True)
+                                .filter(db.or_(*conditions))
+                                .order_by(Internship.created_at.desc())
+                                .limit(6).all())
+
+    # Latest internships for preview
     latest_internships = (Internship.query
                           .filter_by(is_active=True)
                           .order_by(Internship.created_at.desc())
                           .limit(6).all())
+
     return render_template('student/dashboard.html',
                            student=student,
+                           dept_fields=dept_fields,
+                           matching_internships=matching_internships,
                            latest_internships=latest_internships,
                            app_counts=app_counts)
 
@@ -63,7 +89,7 @@ def profile():
         student.field_of_study     = request.form.get('field_of_study', '').strip()
         student.year_of_study      = request.form.get('year_of_study', type=int)
         student.expected_graduation= request.form.get('expected_graduation', '').strip()
-        student.gpa                = request.form.get('gpa', type=float)
+        student.gpa                = request.form.get('gpa', type=float) or request.form.get('cgpa', type=float)
         student.location           = request.form.get('location', '').strip()
         student.bio                = request.form.get('bio', '').strip()
 
@@ -97,6 +123,8 @@ def profile():
 
     return render_template('student/profile.html',
                            student=student,
+                           departments_data=DBU_DEPARTMENTS,
+                           dept_fields=get_fields_for_department(student.department),
                            skills_by_cat=skills_by_cat,
                            all_interests=all_interests)
 

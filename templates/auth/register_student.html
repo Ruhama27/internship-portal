@@ -1,71 +1,124 @@
 {% extends 'base.html' %}
-{% block title %}Student Registration — InternMatch{% endblock %}
+{% block title %}Student Registration — Debre Berhan University Portal{% endblock %}
 
 {% block content %}
 <div class="container-sm section">
-  <div class="card card-glow">
+  <div class="card card-glow" style="max-width: 650px; margin: 0 auto;">
     <div class="text-center mb-4">
-      <span class="tag primary mb-2">👨🎓 Student Portal</span>
-      <h2>Create Student Account</h2>
-      <p class="text-sm">Start discovering personalized internship recommendations</p>
+      <div class="company-logo mb-2" style="margin: 0 auto; width: 54px; height: 54px; font-size: 1.5rem; background: var(--gradient-btn-primary);">
+        🎓
+      </div>
+      <h2>Student Portal Registration</h2>
+      <p class="text-sm text-muted">Register with your Debre Berhan University academic credentials</p>
     </div>
 
-    <form method="POST">
+    <form method="POST" id="studentRegForm">
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Full Name *</label>
-          <input type="text" name="full_name" class="form-control" placeholder="Ruhama Nigusu" required>
+          <label class="form-label">Full Name <span style="color:var(--color-danger)">*</span></label>
+          <input type="text" name="full_name" class="form-control" placeholder="e.g. Ruhama Nigusu" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Student ID *</label>
-          <input type="text" name="student_id" class="form-control" placeholder="DBU/1234/15" required>
+          <label class="form-label">Student ID <span style="color:var(--color-danger)">*</span></label>
+          <input type="text" name="student_id" class="form-control" placeholder="e.g. DBU/001/2022" required>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">University Email *</label>
-        <input type="email" name="email" class="form-control" placeholder="ruhama@student.edu" required>
+        <label class="form-label">University / Student Email <span style="color:var(--color-danger)">*</span></label>
+        <input type="email" name="email" class="form-control" placeholder="name@student.dbu.edu.et" required>
+      </div>
+
+      <input type="hidden" name="university" value="Debre Berhan University">
+
+      <!-- Academic Information (Department, Academic Year, CGPA) -->
+      <div class="p-3 mb-4" style="background: rgba(14, 165, 233, 0.04); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: var(--radius-md);">
+        <div style="font-weight: 700; font-size: 0.9rem; color: #0284c7; margin-bottom: 12px;">
+          📚 Academic Information
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Department <span style="color:var(--color-danger)">*</span></label>
+            <select name="department" id="departmentSelect" class="form-control" required onchange="updateFields()">
+              <option value="">-- Select Your Department --</option>
+              {% for dept in departments_data.keys() %}
+                <option value="{{ dept }}">{{ dept }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Academic Year <span style="color:var(--color-danger)">*</span></label>
+            <select name="year_of_study" class="form-control" required>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3" selected>3rd Year (Internship Eligible)</option>
+              <option value="4">4th Year / Final Year</option>
+              <option value="5">5th Year (Engineering)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">CGPA (Cumulative GPA) <span style="color:var(--color-danger)">*</span></label>
+            <input type="number" step="0.01" min="0.00" max="4.00" name="cgpa" class="form-control" placeholder="e.g. 3.75" required>
+            <span class="text-xs text-muted">Scale 0.00 - 4.00</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Specialization Field <span style="color:var(--color-danger)">*</span></label>
+            <select name="field_of_study" id="fieldSelect" class="form-control" required>
+              <option value="">-- Choose Department First --</option>
+            </select>
+            <span class="text-xs text-muted">Automatically populated based on department</span>
+          </div>
+        </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">University Name *</label>
-          <input type="text" name="university" class="form-control" placeholder="Debre Berhan University" required>
+          <label class="form-label">Password <span style="color:var(--color-danger)">*</span></label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" minlength="6" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Department / Field *</label>
-          <input type="text" name="department" class="form-control" placeholder="Software Engineering" required>
+          <label class="form-label">Confirm Password <span style="color:var(--color-danger)">*</span></label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" minlength="6" required>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Year of Study *</label>
-        <select name="year_of_study" class="form-control" required>
-          <option value="1">1st Year</option>
-          <option value="2">2nd Year</option>
-          <option value="3" selected>3rd Year</option>
-          <option value="4">4th Year / Final Year</option>
-          <option value="5">Postgraduate / Masters</option>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Password *</label>
-          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm Password *</label>
-          <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" required>
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">Create Student Account →</button>
+      <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">Register Student Account →</button>
     </form>
 
-    <div class="text-center mt-4 text-sm">
-      Already have an account? <a href="{{ url_for('auth.login') }}" class="gradient-text font-medium">Log in here</a>
+    <div class="text-center mt-4 text-sm text-muted">
+      Already registered? <a href="{{ url_for('auth.login') }}" class="gradient-text font-bold">Log in here</a>
     </div>
   </div>
 </div>
+
+<script>
+const departmentFields = {{ departments_data | tojson }};
+
+function updateFields() {
+  const deptSelect = document.getElementById('departmentSelect');
+  const fieldSelect = document.getElementById('fieldSelect');
+  const selectedDept = deptSelect.value;
+
+  fieldSelect.innerHTML = '';
+
+  if (selectedDept && departmentFields[selectedDept]) {
+    const fields = departmentFields[selectedDept];
+    fieldSelect.innerHTML = '<option value="">-- Select Your Field of Study --</option>';
+    fields.forEach(function(field) {
+      const option = document.createElement('option');
+      option.value = field;
+      option.textContent = field;
+      fieldSelect.appendChild(option);
+    });
+  } else {
+    fieldSelect.innerHTML = '<option value="">-- Choose Department First --</option>';
+  }
+}
+</script>
 {% endblock %}

@@ -133,9 +133,8 @@
             <div>
               <div class="text-xs font-bold text-muted mb-1">🎓 ACADEMIC BACKGROUND</div>
               <div class="text-xs" style="line-height: 1.6;">
-                <div><strong>University:</strong> {{ s.university or 'Debre Berhan University' }}</div>
-                <div><strong>Department:</strong> {{ s.department or 'N/A' }} ({{ s.field_of_study or 'General' }})</div>
-                <div><strong>Year of Study:</strong> Year {{ s.year_of_study or '?' }} {% if s.gpa %}&bull; <strong>GPA:</strong> {{ s.gpa }}{% endif %}</div>
+                <div><strong>Department:</strong> <span style="color:var(--color-cyan); font-weight:700;">{{ s.department or 'N/A' }}</span> {% if s.field_of_study %}&bull; <strong>Field:</strong> {{ s.field_of_study }}{% endif %}</div>
+                <div><strong>Academic Year:</strong> Year {{ s.year_of_study or '?' }} &bull; <strong>CGPA:</strong> <span class="text-success font-bold">{% if s.gpa %}{{ '%.2f'|format(s.gpa) }}{% else %}N/A{% endif %}</span></div>
                 {% if s.location %}<div><strong>Location:</strong> {{ s.location }}</div>{% endif %}
               </div>
             </div>

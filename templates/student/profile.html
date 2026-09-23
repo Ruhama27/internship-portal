@@ -56,39 +56,57 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">University</label>
-          <input type="text" name="university" class="form-control" value="{{ student.university or '' }}" required>
+          <input type="text" name="university" class="form-control" value="{{ student.university or 'Debre Berhan University' }}" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Department</label>
-          <input type="text" name="department" class="form-control" value="{{ student.department or '' }}" required>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Field of Study</label>
-          <input type="text" name="field_of_study" class="form-control" value="{{ student.field_of_study or '' }}" placeholder="e.g. Software Engineering, Data Science">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Year of Study</label>
-          <select name="year_of_study" class="form-control">
-            <option value="1" {% if student.year_of_study == 1 %}selected{% endif %}>1st Year</option>
-            <option value="2" {% if student.year_of_study == 2 %}selected{% endif %}>2nd Year</option>
-            <option value="3" {% if student.year_of_study == 3 %}selected{% endif %}>3rd Year</option>
-            <option value="4" {% if student.year_of_study == 4 %}selected{% endif %}>4th Year / Final Year</option>
-            <option value="5" {% if student.year_of_study == 5 %}selected{% endif %}>Postgraduate</option>
+          <label class="form-label">Department *</label>
+          <select name="department" id="profileDeptSelect" class="form-control" required onchange="updateProfileFields()">
+            <option value="">-- Select Department --</option>
+            {% for dept in departments_data.keys() %}
+              <option value="{{ dept }}" {% if student.department == dept %}selected{% endif %}>{{ dept }}</option>
+            {% endfor %}
+            {% if student.department and student.department not in departments_data %}
+              <option value="{{ student.department }}" selected>{{ student.department }}</option>
+            {% endif %}
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Expected Graduation Year</label>
-          <input type="text" name="expected_graduation" class="form-control" value="{{ student.expected_graduation or '' }}" placeholder="2025">
+          <label class="form-label">Specialization Field (Based on Department) *</label>
+          <select name="field_of_study" id="profileFieldSelect" class="form-control" required>
+            <option value="">-- Choose Specialization Field --</option>
+            {% for f in dept_fields %}
+              <option value="{{ f }}" {% if student.field_of_study == f %}selected{% endif %}>{{ f }}</option>
+            {% endfor %}
+            {% if student.field_of_study and student.field_of_study not in dept_fields %}
+              <option value="{{ student.field_of_study }}" selected>{{ student.field_of_study }}</option>
+            {% endif %}
+          </select>
+          <span class="text-xs text-muted">Automatically detected and filtered based on your department</span>
         </div>
         <div class="form-group">
-          <label class="form-label">GPA (Optional)</label>
-          <input type="number" step="0.01" min="0" max="4.0" name="gpa" class="form-control" value="{{ student.gpa or '' }}" placeholder="3.80">
+          <label class="form-label">Academic Year (Year of Study) *</label>
+          <select name="year_of_study" class="form-control" required>
+            <option value="1" {% if student.year_of_study == 1 %}selected{% endif %}>1st Year</option>
+            <option value="2" {% if student.year_of_study == 2 %}selected{% endif %}>2nd Year</option>
+            <option value="3" {% if student.year_of_study == 3 %}selected{% endif %}>3rd Year (Internship Eligible)</option>
+            <option value="4" {% if student.year_of_study == 4 %}selected{% endif %}>4th Year / Final Year</option>
+            <option value="5" {% if student.year_of_study == 5 %}selected{% endif %}>5th Year (Engineering)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">CGPA (Cumulative GPA) *</label>
+          <input type="number" step="0.01" min="0.0" max="4.0" name="cgpa" class="form-control" value="{{ '%.2f'|format(student.gpa) if student.gpa else '' }}" placeholder="3.80" required>
+          <span class="text-xs text-muted">Your university cumulative grade point average (0.00 - 4.00)</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Expected Graduation Year</label>
+          <input type="text" name="expected_graduation" class="form-control" value="{{ student.expected_graduation or '' }}" placeholder="e.g. 2025">
         </div>
       </div>
 
@@ -183,4 +201,31 @@
     </div>
   </form>
 </div>
+
+<script>
+const departmentFields = {{ departments_data | tojson }};
+
+function updateProfileFields() {
+  const deptSelect = document.getElementById('profileDeptSelect');
+  const fieldSelect = document.getElementById('profileFieldSelect');
+  const selectedDept = deptSelect.value;
+  const currentVal = fieldSelect.value;
+
+  fieldSelect.innerHTML = '';
+
+  if (selectedDept && departmentFields[selectedDept]) {
+    const fields = departmentFields[selectedDept];
+    fieldSelect.innerHTML = '<option value="">-- Choose Specialization Field --</option>';
+    fields.forEach(function(field) {
+      const option = document.createElement('option');
+      option.value = field;
+      option.textContent = field;
+      if (field === currentVal) option.selected = true;
+      fieldSelect.appendChild(option);
+    });
+  } else {
+    fieldSelect.innerHTML = '<option value="">-- Choose Department First --</option>';
+  }
+}
+</script>
 {% endblock %}

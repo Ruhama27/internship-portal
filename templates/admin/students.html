@@ -17,9 +17,9 @@
         <table>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Student ID</th>
-              <th>University / Department</th>
+              <th>Student</th>
+              <th>Department & Field</th>
+              <th>Year & CGPA</th>
               <th>Email</th>
               <th>Applications</th>
               <th>Status</th>
@@ -31,12 +31,17 @@
               <tr>
                 <td>
                   <div class="font-bold">{{ student.full_name or '—' }}</div>
-                  <div class="text-xs text-muted">Year {{ student.year_of_study or '?' }}</div>
+                  <div class="text-xs text-muted">{{ student.student_id or '—' }}</div>
                 </td>
-                <td class="text-xs text-muted">{{ student.student_id or '—' }}</td>
                 <td>
-                  <div class="text-xs">{{ student.university or '—' }}</div>
-                  <div class="text-xs text-muted">{{ student.department or '—' }}</div>
+                  <div class="font-bold text-xs" style="color: var(--color-cyan);">{{ student.department or '—' }}</div>
+                  <div class="text-xs text-muted">{{ student.field_of_study or 'General' }}</div>
+                </td>
+                <td>
+                  <div class="text-xs">Year {{ student.year_of_study or '?' }}</div>
+                  <div class="text-xs font-bold text-success">
+                    {% if student.gpa %}CGPA: {{ '%.2f'|format(student.gpa) }}{% else %}CGPA: —{% endif %}
+                  </div>
                 </td>
                 <td class="text-xs">{{ student.user.email }}</td>
                 <td class="text-center">

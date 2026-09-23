@@ -5,11 +5,14 @@ from models import Internship, Skill, Interest, Application
 internship_bp = Blueprint('internship', __name__)
 
 
+from departments_data import DBU_DEPARTMENTS, get_fields_for_department
+
 @internship_bp.route('/')
 def search():
-    """Search & filter internships."""
+    """Search & filter internships with department detection."""
     q         = request.args.get('q', '').strip()
     field     = request.args.get('field', '').strip()
+    dept      = request.args.get('department', '').strip()
     location  = request.args.get('location', '').strip()
     work_type = request.args.getlist('work_type')
     skill_ids = request.args.getlist('skills', type=int)
@@ -44,12 +47,27 @@ def search():
               .distinct().all())
     fields = sorted(set(f[0] for f in fields if f[0]))
 
+    # Detect student department if logged in
+    detected_dept = dept
+    dept_fields = []
+    if not detected_dept and current_user.is_authenticated and current_user.role == 'student':
+        student = current_user.student_profile
+        if student and student.department:
+            detected_dept = student.department
+
+    if detected_dept:
+        dept_fields = get_fields_for_department(detected_dept)
+
     return render_template('internship/search.html',
                            internships=internships,
                            all_skills=all_skills,
                            fields=fields,
                            q=q,
+                           detected_dept=detected_dept,
+                           dept_fields=dept_fields,
+                           departments_data=DBU_DEPARTMENTS,
                            selected_field=field,
+                           selected_dept=detected_dept,
                            selected_location=location,
                            selected_work_type=work_type,
                            selected_skills=skill_ids)
