@@ -23,7 +23,7 @@
           <div class="completion-fill" style="width: {{ student.completion_percent }}%;"></div>
         </div>
         {% if student.completion_percent < 80 %}
-          <a href="{{ url_for('student.profile') }}" class="text-xs text-warning mt-1 inline-block">⚠️ Add skills & CV to improve AI match accuracy →</a>
+          <a href="{{ url_for('student.profile') }}" class="text-xs text-warning mt-1 inline-block">⚠️ Add skills & CV to complete your profile →</a>
         {% endif %}
       </div>
     </div>
@@ -56,7 +56,7 @@
   <!-- Recommendations Section -->
   <div class="flex-between mb-4">
     <div>
-      <h2>Recommended for You <span class="tag primary" style="font-size:0.8rem;">AI Matched</span></h2>
+      <h2>Recommended for You</h2>
       <p class="text-sm">Matched based on your skills, field of study, and career interests</p>
     </div>
     <a href="{{ url_for('internship.search') }}" class="btn btn-outline btn-sm">Search All Listings →</a>
@@ -111,7 +111,7 @@
     <div class="empty-state">
       <div class="empty-icon">🔍</div>
       <h3 class="empty-title">No recommendations yet</h3>
-      <p class="empty-desc">Complete your profile skills and interests to see AI matched internships.</p>
+      <p class="empty-desc">Complete your profile skills and interests to see matched internships.</p>
       <a href="{{ url_for('student.profile') }}" class="btn btn-primary">Complete Profile Now</a>
     </div>
   {% endif %}

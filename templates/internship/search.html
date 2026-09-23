@@ -33,7 +33,35 @@
 
         <div class="filter-section">
           <div class="filter-title">Work Location</div>
-          <input type="text" name="location" class="form-control text-sm" placeholder="e.g. Addis Ababa" value="{{ selected_location }}">
+          <select name="location" class="form-control text-sm">
+            <option value="">All Cities</option>
+            <option value="Addis Ababa, Ethiopia" {% if selected_location == 'Addis Ababa, Ethiopia' %}selected{% endif %}>Addis Ababa</option>
+            <option value="Adama (Nazret), Ethiopia" {% if selected_location == 'Adama (Nazret), Ethiopia' %}selected{% endif %}>Adama (Nazret)</option>
+            <option value="Arba Minch, Ethiopia" {% if selected_location == 'Arba Minch, Ethiopia' %}selected{% endif %}>Arba Minch</option>
+            <option value="Asella, Ethiopia" {% if selected_location == 'Asella, Ethiopia' %}selected{% endif %}>Asella</option>
+            <option value="Axum, Ethiopia" {% if selected_location == 'Axum, Ethiopia' %}selected{% endif %}>Axum</option>
+            <option value="Bahir Dar, Ethiopia" {% if selected_location == 'Bahir Dar, Ethiopia' %}selected{% endif %}>Bahir Dar</option>
+            <option value="Bishoftu (Debre Zeit), Ethiopia" {% if selected_location == 'Bishoftu (Debre Zeit), Ethiopia' %}selected{% endif %}>Bishoftu (Debre Zeit)</option>
+            <option value="Debre Berhan, Ethiopia" {% if selected_location == 'Debre Berhan, Ethiopia' %}selected{% endif %}>Debre Berhan</option>
+            <option value="Debre Markos, Ethiopia" {% if selected_location == 'Debre Markos, Ethiopia' %}selected{% endif %}>Debre Markos</option>
+            <option value="Dessie, Ethiopia" {% if selected_location == 'Dessie, Ethiopia' %}selected{% endif %}>Dessie</option>
+            <option value="Dilla, Ethiopia" {% if selected_location == 'Dilla, Ethiopia' %}selected{% endif %}>Dilla</option>
+            <option value="Dire Dawa, Ethiopia" {% if selected_location == 'Dire Dawa, Ethiopia' %}selected{% endif %}>Dire Dawa</option>
+            <option value="Gondar, Ethiopia" {% if selected_location == 'Gondar, Ethiopia' %}selected{% endif %}>Gondar</option>
+            <option value="Harar, Ethiopia" {% if selected_location == 'Harar, Ethiopia' %}selected{% endif %}>Harar</option>
+            <option value="Hawassa, Ethiopia" {% if selected_location == 'Hawassa, Ethiopia' %}selected{% endif %}>Hawassa</option>
+            <option value="Hosaena, Ethiopia" {% if selected_location == 'Hosaena, Ethiopia' %}selected{% endif %}>Hosaena</option>
+            <option value="Jijiga, Ethiopia" {% if selected_location == 'Jijiga, Ethiopia' %}selected{% endif %}>Jijiga</option>
+            <option value="Jimma, Ethiopia" {% if selected_location == 'Jimma, Ethiopia' %}selected{% endif %}>Jimma</option>
+            <option value="Lalibela, Ethiopia" {% if selected_location == 'Lalibela, Ethiopia' %}selected{% endif %}>Lalibela</option>
+            <option value="Mekelle, Ethiopia" {% if selected_location == 'Mekelle, Ethiopia' %}selected{% endif %}>Mekelle</option>
+            <option value="Nekemte, Ethiopia" {% if selected_location == 'Nekemte, Ethiopia' %}selected{% endif %}>Nekemte</option>
+            <option value="Shashamane, Ethiopia" {% if selected_location == 'Shashamane, Ethiopia' %}selected{% endif %}>Shashamane</option>
+            <option value="Shire, Ethiopia" {% if selected_location == 'Shire, Ethiopia' %}selected{% endif %}>Shire</option>
+            <option value="Sodo, Ethiopia" {% if selected_location == 'Sodo, Ethiopia' %}selected{% endif %}>Sodo</option>
+            <option value="Woldia, Ethiopia" {% if selected_location == 'Woldia, Ethiopia' %}selected{% endif %}>Woldia</option>
+            <option value="Wolaita Sodo, Ethiopia" {% if selected_location == 'Wolaita Sodo, Ethiopia' %}selected{% endif %}>Wolaita Sodo</option>
+          </select>
         </div>
 
         <div class="filter-section">
